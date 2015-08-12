@@ -70,8 +70,8 @@ ModelImporter:
     400062: transform16
     400064: transform19
     4300000: polySurface2
-    7400000: Damage
-    7400002: Idle
+    7400000: Idle
+    7400002: Damage
     7400004: Run
     7400006: RunRight
     7400008: RunLeft
@@ -290,7 +290,7 @@ ModelImporter:
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
-      loop: 1
+      loop: 0
       loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 0
@@ -382,7 +382,7 @@ ModelImporter:
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
-      loop: 1
+      loop: 0
       loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 0
@@ -474,7 +474,7 @@ ModelImporter:
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
-      loop: 1
+      loop: 0
       loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 0
@@ -562,7 +562,7 @@ ModelImporter:
       takeName: Take 001
       firstFrame: 100
       lastFrame: 140
-      wrapMode: 0
+      wrapMode: 1
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
@@ -654,7 +654,7 @@ ModelImporter:
       takeName: Take 001
       firstFrame: 150
       lastFrame: 168
-      wrapMode: 0
+      wrapMode: 1
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
@@ -746,7 +746,7 @@ ModelImporter:
       takeName: Take 001
       firstFrame: 169
       lastFrame: 195
-      wrapMode: 0
+      wrapMode: 1
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
