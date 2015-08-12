@@ -1,0 +1,16 @@
+*.csproj
+*.sln
+*.DotSettings
+*.suo
+*.userprefs
+*.DS_Store
+*.unityproj
+/obj/
+/Library/
+/Temp/
+/Assets/UnityVS/
+/Assets/UnityVS.meta
+/Intermediate/
+/UnityVS.nico-client.sln.ide/
+/Release/
+/.vs
