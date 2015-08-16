@@ -22,6 +22,7 @@ namespace Clicker {
 
 		float nextPosition;
 		float distanceSum;
+		int regionCount;
 
 		void Start() {
 			DB.Database.Instance.LoadDatabase();
@@ -30,29 +31,47 @@ namespace Clicker {
 			knightAnime.anime.CrossFade("Run");
 
 			distanceSum = 0;
-			nextRegion = CreateRegion();
+			regionCount = 0;
+			knightInfo = new KnightInfo();
+			nextRegion = CreateNextRegion();
 			nextRegion.transform.localPosition = new Vector3(0, 0, 0);
 
 			GoNextRegion();
 		}
 
-		Region CreateRegion() {
+		Region CreateNextRegion() {
+			regionCount++;
+			if (regionCount % 2 == 1) {
+				return CreateBattleRegion();
+			} else {
+				return CreateBlackSmithRegion();
+			}
+		}
+
+		Region CreateBattleRegion() {
 			var region = regionPool.Allocate().GetComponent<Region>();
 			region.transform.parent = this.transform;
 			RegionMeta meta = new RegionMeta();
 			meta.type = RegionType.Monster;
-			meta.length = ScreenWidth;
 			meta.monsterInfo = new MonsterInfo(DB.Database.Instance.GetMonsterById("1"), 1);
 			region.Reset(meta);
 
 			return region;
 		}
 
-		void Update() {
-			if (state == State.Running) {
+		Region CreateBlackSmithRegion() {
+			var region = regionPool.Allocate().GetComponent<Region>();
+			region.transform.parent = this.transform;
+			RegionMeta meta = new RegionMeta();
+			meta.type = RegionType.BlackSmith;
+			region.Reset(meta);
 
-			} else if (state == State.Battle) {
-				
+			return region;
+		}
+
+		void Update() {
+			if (Input.GetMouseButton(1)) {
+
 			}
 		}
 
@@ -63,7 +82,7 @@ namespace Clicker {
 
 			lastRegion = currentRegion;
 			currentRegion = nextRegion;
-			nextRegion = CreateRegion();
+			nextRegion = CreateNextRegion();
 			nextRegion.transform.localPosition = currentRegion.transform.localPosition + new Vector3(currentRegion.length, 0, 0);
 
 			nextPosition = distanceSum + currentRegion.length;
@@ -73,8 +92,16 @@ namespace Clicker {
 				currentRegion.length / regionMoveSpeed,
 				knightAnime.transform.localPosition,
 				knightAnime.transform.localPosition + new Vector3(currentRegion.length, 0, 0));
-			UIAnimator.Begin(gameObject, tween, EnterBattle);
+			UIAnimator.Begin(gameObject, tween, RegionAction);
 			
+		}
+
+		void RegionAction() {
+			if (currentRegion.type == RegionType.Monster) {
+				EnterBattle();
+			} else {
+				GoNextRegion();
+			}
 		}
 
 		void EnterBattle() {
@@ -93,8 +120,6 @@ namespace Clicker {
 
 			UIAnimator.Begin(this.gameObject, builder.First);
 		}
-
-		float ScreenWidth { get { return 1.0f * 2 * Screen.width / Screen.height; } }
 	}
 
 }

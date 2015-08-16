@@ -29,6 +29,8 @@ namespace Box {
 					list[list.Count - 1].root = this;
 					list[list.Count - 1].isUsing = false;
 					list[list.Count - 1].Init();
+
+					list[list.Count - 1].gameObject.SetActive(false);
 				}
 			}
 			poolSize = size;

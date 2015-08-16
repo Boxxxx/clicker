@@ -5,11 +5,18 @@ using Box;
 namespace Clicker {
 
 	public class Region : ReusableObject {
+		
+		public TextMesh text;
+		public BoxCollider clickArea;
 
-		public RegionType type = RegionType.BlackSmith;
+		[HideInInspector]
 		public MonsterInfo monsterInfo;
+		[HideInInspector]
 		public MonsterAnimation monsterAnime;
+		[HideInInspector]
 		public float length;
+		[HideInInspector]
+		public RegionType type = RegionType.BlackSmith;
 
 		public void Reset(RegionMeta meta) {
 			switch (meta.type) {
@@ -20,17 +27,28 @@ namespace Clicker {
 					monsterAnime.gameObject.transform.localPosition = new Vector3(1.2f, 0, 0);
 
 					monsterAnime.anime.CrossFade("Idle");
-					length = meta.length;
+					length = GameConsts.ScreenWidth;
+
+					clickArea.gameObject.SetActive(false);
+					text.text = "怪兽区域";
 					break;
 				case RegionType.BlackSmith:
+					monsterAnime = null;
 
+					length = GameConsts.ScreenWidth * 2;
+					clickArea.gameObject.SetActive(true);
+					clickArea.transform.localPosition = new Vector3(GameConsts.ScreenWidth, 0, 0);
+					clickArea.size = new Vector3(GameConsts.ScreenWidth, GameConsts.ScreenHeight, 0);
+					text.text = "武器升级";
 					break;
 			}
 			type = meta.type;
 		}
 
 		public override void Deactive() {
-			GameObject.Destroy(monsterAnime.gameObject);
+			if (monsterAnime != null) {
+				GameObject.Destroy(monsterAnime.gameObject);
+			}
 			base.Deactive();
 		}
 	}
