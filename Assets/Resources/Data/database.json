@@ -1,10 +1,50 @@
 {
-	"monster" : {
-		"1" : {
-			"id" : "1",
-			"name" : "slim",
-			"atk" : 10,
-			"hp" : 100
-		}
-	}
+  "monster": {
+    "1": {
+      "id": "1",
+      "name": "slim",
+      "atk": 10,
+      "hp": 100
+    }
+  },
+  "character": {
+    "atkLevels": [
+      {
+        "goldToNext": 100,
+        "level": 0,
+        "value": 50
+      },
+      {
+        "goldToNext": 200,
+        "level": 0,
+        "value": 100
+      }
+    ],
+    "defLevels": [
+      {
+        "goldToNext": 100,
+        "level": 0,
+        "value": 150
+      },
+      {
+        "goldToNext": 200,
+        "level": 0,
+        "value": 300
+      }
+    ]
+  },
+  "cost": {
+    "atkLevelUp": [
+      100,
+      200,
+      300,
+      400
+    ],
+    "defLevelUp": [
+      100,
+      200,
+      300,
+      400
+    ]
+  }
 }

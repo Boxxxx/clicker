@@ -5,11 +5,11 @@ namespace Clicker {
 
 	using DB;
 
-	public class MonsterInfo {
+	public class MonsterDataInst {
 		public DBMonster raw;
 		public int level;
 
-		public MonsterInfo(DBMonster dbMonster, int level) {
+		public MonsterDataInst(DBMonster dbMonster, int level) {
 			this.raw = dbMonster;
 			this.level = level;
 		}

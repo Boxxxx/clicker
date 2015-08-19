@@ -26,6 +26,7 @@ namespace Box {
 				int addCount = size - list.Count;
 				for (int i = 0; i < addCount; i++) {
 					list.Add(GameObject.Instantiate(targetPrefab) as ReusableObject);
+					list[list.Count - 1].transform.parent = poolRoot.transform;
 					list[list.Count - 1].root = this;
 					list[list.Count - 1].isUsing = false;
 					list[list.Count - 1].Init();
@@ -36,11 +37,15 @@ namespace Box {
 			poolSize = size;
 		}
 
-		// Use this for initialization
-		void Start() {
+		void Awake() {
 			if (poolRoot == null) {
 				poolRoot = gameObject;
 			}
+		}
+
+		// Use this for initialization
+		void Start() {
+
 		}
 
 		public ReusableObject Allocate() {

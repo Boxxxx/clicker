@@ -8,13 +8,10 @@ namespace Clicker {
 
 		enum State { Battle, Running }
 
-		public KnightAnimation knightAnime;
-
-		public float regionMoveSpeed;
+		public CharacterAnimation charAnime;
 
 		State state = State.Running;
 		ReusePool regionPool;
-		KnightInfo knightInfo;
 
 		Region lastRegion;
 		Region currentRegion;
@@ -23,18 +20,29 @@ namespace Clicker {
 		float nextPosition;
 		float distanceSum;
 		int regionCount;
+		int regionLayer;
+
+		void DbInit() {
+			DB.ConstDB.Instance.LoadDatabase();
+			DB.PlayerData.Instance.LoadData();
+		}
+
+		void Awake() {
+			DbInit();
+		}
 
 		void Start() {
-			DB.Database.Instance.LoadDatabase();
+
 			regionPool = GetComponent<ReusePool>();
 			regionPool.SetPoolSize(3);
-			knightAnime.anime.CrossFade("Run");
+			charAnime.anime.CrossFade("Run");
 
 			distanceSum = 0;
 			regionCount = 0;
-			knightInfo = new KnightInfo();
 			nextRegion = CreateNextRegion();
 			nextRegion.transform.localPosition = new Vector3(0, 0, 0);
+
+			regionLayer = 1 << LayerMask.NameToLayer("Region");
 
 			GoNextRegion();
 		}
@@ -53,7 +61,7 @@ namespace Clicker {
 			region.transform.parent = this.transform;
 			RegionMeta meta = new RegionMeta();
 			meta.type = RegionType.Monster;
-			meta.monsterInfo = new MonsterInfo(DB.Database.Instance.GetMonsterById("1"), 1);
+			meta.monsterInfo = new MonsterDataInst(DB.ConstDB.Instance.GetMonsterById("1"), 1);
 			region.Reset(meta);
 
 			return region;
@@ -70,8 +78,22 @@ namespace Clicker {
 		}
 
 		void Update() {
-			if (Input.GetMouseButton(1)) {
+			if (Input.GetMouseButtonDown(0)) {
+				if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), 100, regionLayer)) {
+					TriggerCurrentRegionEvent();
+				}
+			}
+		}
 
+		void TriggerCurrentRegionEvent() {
+			if (currentRegion.type == RegionType.BlackSmith) {
+				if (currentRegion.isTriggered == false) {
+					currentRegion.isTriggered = true;
+
+					Debug.Log("Weapon level up!");
+
+					currentRegion.clickArea.gameObject.SetActive(false);
+				}
 			}
 		}
 
@@ -81,6 +103,9 @@ namespace Clicker {
 			}
 
 			lastRegion = currentRegion;
+			if (lastRegion != null) {
+				lastRegion.clickArea.gameObject.SetActive(false);
+			}
 			currentRegion = nextRegion;
 			nextRegion = CreateNextRegion();
 			nextRegion.transform.localPosition = currentRegion.transform.localPosition + new Vector3(currentRegion.length, 0, 0);
@@ -88,10 +113,10 @@ namespace Clicker {
 			nextPosition = distanceSum + currentRegion.length;
 			distanceSum += currentRegion.length;
 
-			var tween = UIAnimation.TweenPosition(knightAnime.gameObject,
-				currentRegion.length / regionMoveSpeed,
-				knightAnime.transform.localPosition,
-				knightAnime.transform.localPosition + new Vector3(currentRegion.length, 0, 0));
+			var tween = UIAnimation.TweenPosition(charAnime.gameObject,
+				currentRegion.length / GameConsts.Inst.characterMoveSpeed,
+				charAnime.transform.localPosition,
+				charAnime.transform.localPosition + new Vector3(currentRegion.length, 0, 0));
 			UIAnimator.Begin(gameObject, tween, RegionAction);
 			
 		}
@@ -109,11 +134,11 @@ namespace Clicker {
 			var builder = new UIAnimationBuilder();
 			builder += new UIAnimation(1.0f, (p) => { });
 			builder.Last.onStart = () => {
-				knightAnime.anime.CrossFade("ATK2");
+				charAnime.anime.CrossFade("ATK2");
 				currentRegion.monsterAnime.anime.CrossFade("Die");
 			};
 			builder.Last.onFinish = () => {
-				knightAnime.anime.CrossFade("Run");
+				charAnime.anime.CrossFade("Run");
 				GoNextRegion();
 			};
 			builder.MakeChain();

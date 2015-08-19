@@ -10,13 +10,15 @@ namespace Clicker {
 		public BoxCollider clickArea;
 
 		[HideInInspector]
-		public MonsterInfo monsterInfo;
+		public MonsterDataInst monsterInfo;
 		[HideInInspector]
 		public MonsterAnimation monsterAnime;
 		[HideInInspector]
 		public float length;
 		[HideInInspector]
 		public RegionType type = RegionType.BlackSmith;
+		[HideInInspector]
+		public bool isTriggered;
 
 		public void Reset(RegionMeta meta) {
 			switch (meta.type) {
@@ -24,7 +26,7 @@ namespace Clicker {
 					monsterInfo = meta.monsterInfo;
 					monsterAnime = (GameObject.Instantiate(Resources.Load("Monster/monster_" + monsterInfo.raw.id)) as GameObject).GetComponent<MonsterAnimation>();
 					monsterAnime.gameObject.transform.parent = this.transform;
-					monsterAnime.gameObject.transform.localPosition = new Vector3(1.2f, 0, 0);
+					monsterAnime.gameObject.transform.localPosition = new Vector3(1.2f, GameConsts.Inst.monsterYOffset, 0);
 
 					monsterAnime.anime.CrossFade("Idle");
 					length = GameConsts.ScreenWidth;
@@ -40,6 +42,8 @@ namespace Clicker {
 					clickArea.transform.localPosition = new Vector3(GameConsts.ScreenWidth, 0, 0);
 					clickArea.size = new Vector3(GameConsts.ScreenWidth, GameConsts.ScreenHeight, 0);
 					text.text = "武器升级";
+
+					isTriggered = false;
 					break;
 			}
 			type = meta.type;
@@ -58,7 +62,7 @@ namespace Clicker {
 		/// <summary>
 		/// Only used when type = Monster
 		/// </summary>
-		public MonsterInfo monsterInfo;
+		public MonsterDataInst monsterInfo;
 		public float length;
 	}
 

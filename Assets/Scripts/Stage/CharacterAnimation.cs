@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace Clicker {
 
-	public class KnightAnimation : MonoBehaviour {
+	public class CharacterAnimation : MonoBehaviour {
 
 		public Animation anime;
 		string[] animations;
