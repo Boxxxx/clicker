@@ -328,6 +328,15 @@ public class UIAnimation
 		return anime;
 	}
 
+	public static UIAnimation Sleep(float duration, OnStartHandler onStart = null, OnFinishHandler onFinish = null) {
+		UIAnimation anime = new UIAnimation(duration, null);
+		if (onStart != null)
+			anime.onStart += onStart;
+		if (onFinish != null)
+			anime.onFinish += onFinish;
+		return anime;
+	}
+
 
 }
 

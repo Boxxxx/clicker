@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Box;
+using Clicker.DB;
 
 namespace Clicker {
 
@@ -9,6 +10,7 @@ namespace Clicker {
 		enum State { Battle, Running }
 
 		public CharacterAnimation charAnime;
+		public StageUi stageUi;
 
 		State state = State.Running;
 		ReusePool regionPool;
@@ -22,13 +24,17 @@ namespace Clicker {
 		int regionCount;
 		int regionLayer;
 
+		BattleGenerator battleGenerator;
+		bool isInBattleAnime;
+
 		void DbInit() {
-			DB.ConstDB.Instance.LoadDatabase();
-			DB.PlayerData.Instance.LoadData();
+			ConstDB.Instance.LoadDatabase();
+			PlayerData.Instance.LoadData();
 		}
 
 		void Awake() {
 			DbInit();
+			PlayerData.Instance.GetCharacterData().gold += 10000;
 		}
 
 		void Start() {
@@ -83,15 +89,59 @@ namespace Clicker {
 					TriggerCurrentRegionEvent();
 				}
 			}
+
+			if (state == State.Battle) {
+				if (!isInBattleAnime) {
+					var record = battleGenerator.GenerateNext();
+					if (record.recordType == BattleRecord.RecordType.Win || record.recordType == BattleRecord.RecordType.OurAtk) {
+						var anime = UIAnimation.Sleep(1.0f);
+						anime.onStart = () => {
+							isInBattleAnime = true;
+							charAnime.anime.CrossFade("ATK2");
+							currentRegion.monsterAnime.anime.CrossFade("Die");
+						};
+						anime.onFinish = () => {
+							currentRegion.monsterInfo.hp -= record.damage;
+							isInBattleAnime = false;
+						};
+					} else {
+
+					}
+
+					var builder = new UIAnimationBuilder();
+					builder += new UIAnimation(1.0f, (p) => { });
+					builder.Last.onStart = () => {
+						charAnime.anime.CrossFade("ATK2");
+						currentRegion.monsterAnime.anime.CrossFade("Die");
+					};
+					builder.Last.onFinish = () => {
+						charAnime.anime.CrossFade("Run");
+						GoNextRegion();
+					};
+					builder.MakeChain();
+
+					UIAnimator.Begin(this.gameObject, builder.First);
+				}
+			}
 		}
+
+		#region Game Logic
+
+		void TryUpgradeWeapon() {
+			if (!PlayerDataHelper.CanUpgradeWeapon()) {
+				return;
+			}
+			PlayerDataHelper.UpgradeWeapon();
+			stageUi.playerStatusUi.Refresh();
+		}
+
+		#endregion
 
 		void TriggerCurrentRegionEvent() {
 			if (currentRegion.type == RegionType.BlackSmith) {
 				if (currentRegion.isTriggered == false) {
 					currentRegion.isTriggered = true;
-
-					Debug.Log("Weapon level up!");
-
+					TryUpgradeWeapon();
 					currentRegion.clickArea.gameObject.SetActive(false);
 				}
 			}
@@ -118,7 +168,8 @@ namespace Clicker {
 				charAnime.transform.localPosition,
 				charAnime.transform.localPosition + new Vector3(currentRegion.length, 0, 0));
 			UIAnimator.Begin(gameObject, tween, RegionAction);
-			
+
+			state = State.Running;
 		}
 
 		void RegionAction() {
@@ -131,19 +182,11 @@ namespace Clicker {
 
 		void EnterBattle() {
 			state = State.Battle;
-			var builder = new UIAnimationBuilder();
-			builder += new UIAnimation(1.0f, (p) => { });
-			builder.Last.onStart = () => {
-				charAnime.anime.CrossFade("ATK2");
-				currentRegion.monsterAnime.anime.CrossFade("Die");
-			};
-			builder.Last.onFinish = () => {
-				charAnime.anime.CrossFade("Run");
-				GoNextRegion();
-			};
-			builder.MakeChain();
+			battleGenerator = new BattleGenerator(PlayerData.Instance.GetCharacterData(), currentRegion.monsterInfo);
+			isInBattleAnime = false;
 
-			UIAnimator.Begin(this.gameObject, builder.First);
+
+			
 		}
 	}
 

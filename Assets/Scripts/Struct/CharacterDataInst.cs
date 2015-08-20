@@ -15,6 +15,20 @@ namespace Clicker {
 		public int gold = 0;
 		public ItemType itemType = ItemType.None;
 
+		public CharacterDataInst() {
+
+		}
+
+		public CharacterDataInst(CharacterDataInst other) {
+			maxHp = other.maxHp;
+			hp = other.hp;
+			atk = other.atk;
+			defLevel = other.defLevel;
+			atkLevel = other.atkLevel;
+			gold = other.gold;
+			itemType = other.itemType;
+		}
+
 		public void SetAtkLevel(int level) {
 			var property = ConstDB.Instance.GetAtkProperty(level);
 			atkLevel = level;
