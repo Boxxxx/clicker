@@ -94,33 +94,38 @@ namespace Clicker {
 				if (!isInBattleAnime) {
 					var record = battleGenerator.GenerateNext();
 					if (record.recordType == BattleRecord.RecordType.Win || record.recordType == BattleRecord.RecordType.OurAtk) {
+						isInBattleAnime = true;
 						var anime = UIAnimation.Sleep(1.0f);
 						anime.onStart = () => {
-							isInBattleAnime = true;
 							charAnime.anime.CrossFade("ATK2");
 							currentRegion.monsterAnime.anime.CrossFade("Die");
 						};
 						anime.onFinish = () => {
 							currentRegion.monsterInfo.hp -= record.damage;
+							if (currentRegion.monsterInfo.hp <= 0) {
+								GoNextRegion();
+							}
 							isInBattleAnime = false;
+							stageUi.playerStatusUi.Refresh();
 						};
+						UIAnimator.Begin(gameObject, anime);
 					} else {
+						isInBattleAnime = true;
+						var anime = UIAnimation.Sleep(1.0f);
+						anime.onStart = () => {
+							charAnime.anime.CrossFade("Damage");
+							currentRegion.monsterAnime.anime.CrossFade("ATK");
+						};
+						anime.onFinish = () => {
+							PlayerData.Instance.GetCharacterData().hp -= record.damage;
+							if (PlayerData.Instance.GetCharacterData().hp <= 0) {
 
+							}
+							isInBattleAnime = false;
+							stageUi.playerStatusUi.Refresh();
+						};
+						UIAnimator.Begin(gameObject, anime);
 					}
-
-					var builder = new UIAnimationBuilder();
-					builder += new UIAnimation(1.0f, (p) => { });
-					builder.Last.onStart = () => {
-						charAnime.anime.CrossFade("ATK2");
-						currentRegion.monsterAnime.anime.CrossFade("Die");
-					};
-					builder.Last.onFinish = () => {
-						charAnime.anime.CrossFade("Run");
-						GoNextRegion();
-					};
-					builder.MakeChain();
-
-					UIAnimator.Begin(this.gameObject, builder.First);
 				}
 			}
 		}
@@ -167,6 +172,7 @@ namespace Clicker {
 				currentRegion.length / GameConsts.Inst.characterMoveSpeed,
 				charAnime.transform.localPosition,
 				charAnime.transform.localPosition + new Vector3(currentRegion.length, 0, 0));
+			charAnime.anime.CrossFade("Run");
 			UIAnimator.Begin(gameObject, tween, RegionAction);
 
 			state = State.Running;
