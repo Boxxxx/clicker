@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2015 Tasharen Entertainment
+// Copyright 漏 2011-2015 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -224,7 +224,7 @@ public class UIAnchor : MonoBehaviour
 		}
 
 		// Wrapped in an 'if' so the scene doesn't get marked as 'edited' every frame
-		if (useCamera && uiCamera.isOrthoGraphic && mTrans.parent != null)
+		if (useCamera && uiCamera.orthographic && mTrans.parent != null)
 		{
 			v = mTrans.parent.InverseTransformPoint(v);
 			v.x = Mathf.RoundToInt(v.x);
