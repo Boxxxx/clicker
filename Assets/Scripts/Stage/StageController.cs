@@ -66,7 +66,7 @@ namespace Clicker {
 			var region = regionPool.Allocate().GetComponent<Region>();
 			region.transform.parent = this.transform;
 			RegionMeta meta = new RegionMeta();
-			meta.type = RegionType.Monster;
+			meta.type = RegionType.Battle;
 			meta.monsterInfo = new MonsterDataInst(DB.ConstDB.Instance.GetMonsterById("1"), 1);
 			region.Reset(meta);
 
@@ -84,6 +84,8 @@ namespace Clicker {
 		}
 
 		void Update() {
+			
+
 			if (Input.GetMouseButtonDown(0)) {
 				if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), 100, regionLayer)) {
 					TriggerCurrentRegionEvent();
@@ -91,43 +93,12 @@ namespace Clicker {
 			}
 
 			if (state == State.Battle) {
-				if (!isInBattleAnime) {
-					var record = battleGenerator.GenerateNext();
-					if (record.recordType == BattleRecord.RecordType.Win || record.recordType == BattleRecord.RecordType.OurAtk) {
-						isInBattleAnime = true;
-						var anime = UIAnimation.Sleep(1.0f);
-						anime.onStart = () => {
-							charAnime.anime.CrossFade("ATK2");
-							currentRegion.monsterAnime.anime.CrossFade("Die");
-						};
-						anime.onFinish = () => {
-							currentRegion.monsterInfo.hp -= record.damage;
-							if (currentRegion.monsterInfo.hp <= 0) {
-								GoNextRegion();
-							}
-							isInBattleAnime = false;
-							stageUi.playerStatusUi.Refresh();
-						};
-						UIAnimator.Begin(gameObject, anime);
-					} else {
-						isInBattleAnime = true;
-						var anime = UIAnimation.Sleep(1.0f);
-						anime.onStart = () => {
-							charAnime.anime.CrossFade("Damage");
-							currentRegion.monsterAnime.anime.CrossFade("ATK");
-						};
-						anime.onFinish = () => {
-							PlayerData.Instance.GetCharacterData().hp -= record.damage;
-							if (PlayerData.Instance.GetCharacterData().hp <= 0) {
-
-							}
-							isInBattleAnime = false;
-							stageUi.playerStatusUi.Refresh();
-						};
-						UIAnimator.Begin(gameObject, anime);
-					}
-				}
+				
 			}
+		}
+
+		void ShowDamage() {
+
 		}
 
 		#region Game Logic
