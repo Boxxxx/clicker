@@ -57,6 +57,16 @@ namespace Box {
 			}
 			return null;
 		}
+
+		public T Allocate<T>() where T : ReusableObject {
+			for (int i = 0; i < poolSize; i++) {
+				if (list[i].isUsing == false) {
+					list[i].Active();
+					return list[i] as T;
+				}
+			}
+			return null;
+		}
 	}
 
 }

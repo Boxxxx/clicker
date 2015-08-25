@@ -6,12 +6,22 @@ namespace Clicker {
 
 	public abstract class Region : ReusableObject {
 		public RegionType type;
-		public float length;
+		[Tooltip("The scale comparing to ScreenWidth")]
+		public float lengthScale = 1.0f;
+		[Tooltip("A value from 0 to 1 indicating the key point position in region")]
+		public float keyPointPosition = 1.0f;
+
+		public float Length { get { return GameConsts.ScreenWidth * lengthScale; } }
+		public float KeyPointOffset { get { return Length * keyPointPosition; } }
 
 		public TextMesh text;
 		public BoxCollider clickArea;
+		public StageController stageController;
 
-		public abstract void Reset(RegionMeta meta);
+		public abstract void Reset(RegionMeta meta, StageController stageController);
+		public virtual void KeyPointAction() {
+			stageController.GoNextRegion();
+		}
 		public virtual void RegionUpdate() { }
 	}
 
@@ -21,7 +31,6 @@ namespace Clicker {
 		/// Only used when type = Monster
 		/// </summary>
 		public MonsterDataInst monsterInfo;
-		public float length;
 	}
 
 	public enum RegionType {

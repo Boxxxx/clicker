@@ -8,7 +8,9 @@ namespace Clicker {
 		public static float ScreenHeight { get { return 2.0f; } }
 
 		public float characterMoveSpeed;
+		public static float CharacterMoveSpeed { get { return Inst.characterMoveSpeed; } }
 		public float monsterYOffset;
+		public static float MonsterYOffset { get { return Inst.monsterYOffset; } }
 
 		private static GameConsts instance;
 		public static GameConsts Inst {

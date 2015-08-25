@@ -1,19 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using Box;
 using Clicker.DB;
 
 namespace Clicker {
 
 	public class StageController : MonoBehaviour {
-
-		enum State { Battle, Running }
-
 		public CharacterAnimation charAnime;
 		public StageUi stageUi;
-
-		State state = State.Running;
-		ReusePool regionPool;
+		public RegionCreater regionCreater;
 
 		Region lastRegion;
 		Region currentRegion;
@@ -22,10 +18,6 @@ namespace Clicker {
 		float nextPosition;
 		float distanceSum;
 		int regionCount;
-		int regionLayer;
-
-		BattleGenerator battleGenerator;
-		bool isInBattleAnime;
 
 		void DbInit() {
 			ConstDB.Instance.LoadDatabase();
@@ -34,13 +26,11 @@ namespace Clicker {
 
 		void Awake() {
 			DbInit();
+			// TODO(sonicmisora): remove this test line
 			PlayerData.Instance.GetCharacterData().gold += 10000;
 		}
 
 		void Start() {
-
-			regionPool = GetComponent<ReusePool>();
-			regionPool.SetPoolSize(3);
 			charAnime.anime.CrossFade("Run");
 
 			distanceSum = 0;
@@ -48,11 +38,16 @@ namespace Clicker {
 			nextRegion = CreateNextRegion();
 			nextRegion.transform.localPosition = new Vector3(0, 0, 0);
 
-			regionLayer = 1 << LayerMask.NameToLayer("Region");
-
 			GoNextRegion();
 		}
 
+		void Update() {
+			if (currentRegion != null) {
+				currentRegion.RegionUpdate();
+			}
+		}
+
+		// TODO(sonicmisoa): move create region logic into another component
 		Region CreateNextRegion() {
 			regionCount++;
 			if (regionCount % 2 == 1) {
@@ -63,67 +58,30 @@ namespace Clicker {
 		}
 
 		Region CreateBattleRegion() {
-			var region = regionPool.Allocate().GetComponent<Region>();
-			region.transform.parent = this.transform;
 			RegionMeta meta = new RegionMeta();
 			meta.type = RegionType.Battle;
-			meta.monsterInfo = new MonsterDataInst(DB.ConstDB.Instance.GetMonsterById("1"), 1);
-			region.Reset(meta);
+			meta.monsterInfo = new MonsterDataInst(ConstDB.Instance.GetMonsterById("1"), 1);
+
+			var region = regionCreater.Create(meta, this);
+			region.transform.parent = transform;
 
 			return region;
 		}
 
 		Region CreateBlackSmithRegion() {
-			var region = regionPool.Allocate().GetComponent<Region>();
-			region.transform.parent = this.transform;
 			RegionMeta meta = new RegionMeta();
 			meta.type = RegionType.BlackSmith;
-			region.Reset(meta);
+
+			var region = regionCreater.Create(meta, this);
+			region.transform.parent = transform;
 
 			return region;
 		}
 
-		void Update() {
-			
-
-			if (Input.GetMouseButtonDown(0)) {
-				if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), 100, regionLayer)) {
-					TriggerCurrentRegionEvent();
-				}
-			}
-
-			if (state == State.Battle) {
-				
-			}
-		}
-
-		void ShowDamage() {
-
-		}
-
-		#region Game Logic
-
-		void TryUpgradeWeapon() {
-			if (!PlayerDataHelper.CanUpgradeWeapon()) {
-				return;
-			}
-			PlayerDataHelper.UpgradeWeapon();
-			stageUi.playerStatusUi.Refresh();
-		}
-
-		#endregion
-
-		void TriggerCurrentRegionEvent() {
-			if (currentRegion.type == RegionType.BlackSmith) {
-				if (currentRegion.isTriggered == false) {
-					currentRegion.isTriggered = true;
-					TryUpgradeWeapon();
-					currentRegion.clickArea.gameObject.SetActive(false);
-				}
-			}
-		}
-
-		void GoNextRegion() {
+		/// <summary>
+		/// Make the character go to next region and switch current region to the last one
+		/// </summary>
+		public void GoNextRegion() {
 			if (lastRegion != null) {
 				lastRegion.Deactive();
 			}
@@ -134,36 +92,21 @@ namespace Clicker {
 			}
 			currentRegion = nextRegion;
 			nextRegion = CreateNextRegion();
-			nextRegion.transform.localPosition = currentRegion.transform.localPosition + new Vector3(currentRegion.length, 0, 0);
+			nextRegion.transform.localPosition = currentRegion.transform.localPosition + new Vector3(currentRegion.Length, 0, 0);
 
-			nextPosition = distanceSum + currentRegion.length;
-			distanceSum += currentRegion.length;
+			nextPosition = distanceSum + currentRegion.Length;
+			distanceSum += currentRegion.Length;
 
 			var tween = UIAnimation.TweenPosition(charAnime.gameObject,
-				currentRegion.length / GameConsts.Inst.characterMoveSpeed,
+				currentRegion.Length / GameConsts.Inst.characterMoveSpeed,
 				charAnime.transform.localPosition,
-				charAnime.transform.localPosition + new Vector3(currentRegion.length, 0, 0));
+				currentRegion.transform.localPosition + new Vector3(currentRegion.KeyPointOffset, 0, 0));
 			charAnime.anime.CrossFade("Run");
 			UIAnimator.Begin(gameObject, tween, RegionAction);
-
-			state = State.Running;
 		}
 
 		void RegionAction() {
-			if (currentRegion.type == RegionType.Monster) {
-				EnterBattle();
-			} else {
-				GoNextRegion();
-			}
-		}
-
-		void EnterBattle() {
-			state = State.Battle;
-			battleGenerator = new BattleGenerator(PlayerData.Instance.GetCharacterData(), currentRegion.monsterInfo);
-			isInBattleAnime = false;
-
-
-			
+			currentRegion.KeyPointAction();
 		}
 	}
 

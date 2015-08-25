@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Clicker.DB;
 
 namespace Clicker {
 
@@ -9,7 +10,11 @@ namespace Clicker {
 		MonsterAnimation monsterAnime;
 		BattleGenerator battleGenerator;
 
-		public override void Reset(RegionMeta meta) {
+		CharacterAnimation charAnime;
+		bool isBattleEntered;
+		bool isBattleAnimePlaying;
+
+		public override void Reset(RegionMeta meta, StageController stageController) {
 			monsterInfo = meta.monsterInfo;
 			monsterAnime = (GameObject.Instantiate(Resources.Load("Monster/monster_" + monsterInfo.raw.id)) as GameObject).GetComponent<MonsterAnimation>();
 			monsterAnime.gameObject.transform.parent = this.transform;
@@ -19,54 +24,67 @@ namespace Clicker {
 
 			clickArea.gameObject.SetActive(false);
 			text.text = "怪兽区域";
-		}
+			this.stageController = stageController;
+			charAnime = stageController.charAnime;
+			isBattleEntered = false;
+        }
 
 		public override void Deactive() {
 			if (monsterAnime != null) {
-				GameObject.Destroy(monsterAnime);
+				GameObject.Destroy(monsterAnime.gameObject);
 				monsterAnime = null;
 			}
 			base.Deactive();
 		}
 
 		public override void RegionUpdate() {
-			if (!isInBattleAnime) {
+			if (!isBattleEntered) {
+				return;
+			}
+
+			if (!isBattleAnimePlaying) {
 				var record = battleGenerator.GenerateNext();
 				if (record.recordType == BattleRecord.RecordType.Win || record.recordType == BattleRecord.RecordType.OurAtk) {
-					isInBattleAnime = true;
+					isBattleAnimePlaying = true;
 					var anime = UIAnimation.Sleep(1.0f);
 					anime.onStart = () => {
 						charAnime.anime.CrossFade("ATK2");
-						(currentRegion as BattleRegion).monsterAnime.anime.CrossFade("Die");
+						monsterAnime.anime.CrossFade("Die");
 					};
 					anime.onFinish = () => {
-						currentRegion.monsterInfo.hp -= record.damage;
-						if (currentRegion.monsterInfo.hp <= 0) {
-							GoNextRegion();
+						monsterInfo.hp -= record.damage;
+						if (monsterInfo.hp <= 0) {
+							stageController.GoNextRegion();
 						}
-						isInBattleAnime = false;
-						stageUi.playerStatusUi.Refresh();
+						isBattleAnimePlaying = false;
+						stageController.stageUi.playerStatusUi.Refresh();
 					};
 					UIAnimator.Begin(gameObject, anime);
 				} else {
-					isInBattleAnime = true;
+					isBattleAnimePlaying = true;
 					var anime = UIAnimation.Sleep(1.0f);
 					anime.onStart = () => {
 						charAnime.anime.CrossFade("Damage");
-						currentRegion.monsterAnime.anime.CrossFade("ATK");
+						monsterAnime.anime.CrossFade("ATK");
 					};
 					anime.onFinish = () => {
 						PlayerData.Instance.GetCharacterData().hp -= record.damage;
 						if (PlayerData.Instance.GetCharacterData().hp <= 0) {
 
 						}
-						isInBattleAnime = false;
-						stageUi.playerStatusUi.Refresh();
+						isBattleAnimePlaying = false;
+						stageController.stageUi.playerStatusUi.Refresh();
 					};
 					UIAnimator.Begin(gameObject, anime);
 				}
 			}
 		}
+
+		public override void KeyPointAction() {
+			battleGenerator = new BattleGenerator(PlayerData.Instance.GetCharacterData(), monsterInfo);
+			isBattleEntered = true;
+			isBattleAnimePlaying = false;
+        }
 
 	}
 
