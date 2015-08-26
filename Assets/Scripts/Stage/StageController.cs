@@ -31,6 +31,7 @@ namespace Clicker {
 		}
 
 		void Start() {
+			regionCreater.SetAllPoolSize();
 			charAnime.anime.CrossFade("Run");
 
 			distanceSum = 0;
@@ -103,6 +104,10 @@ namespace Clicker {
 				currentRegion.transform.localPosition + new Vector3(currentRegion.KeyPointOffset, 0, 0));
 			charAnime.anime.CrossFade("Run");
 			UIAnimator.Begin(gameObject, tween, RegionAction);
+		}
+
+		public void GameLose() {
+			stageUi.loseLabel.gameObject.SetActive(true);
 		}
 
 		void RegionAction() {

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -11,7 +12,7 @@ public class UIAnimator : MonoBehaviour
 	List<UIAnimation> animations = new List<UIAnimation>();
 
 	Queue<UIAnimation> q = new Queue<UIAnimation>();
-	bool enabled = false;
+	bool animeEnabled = false;
 
 	void Start()
 	{
@@ -37,6 +38,7 @@ public class UIAnimator : MonoBehaviour
 				anime.nowTime = anime.duration;
 				if (anime.onAnimate != null)
 					anime.onAnimate(1.0f);
+				anime.ProcessTimeEvents();
 				if (anime.onFinish != null)
 					anime.onFinish();
 				foreach (var newAnime in anime.next)
@@ -53,6 +55,7 @@ public class UIAnimator : MonoBehaviour
 				anime.nowTime += anime.tempTime;
 				if (anime.onAnimate != null)
 					anime.onAnimate(anime.easeFunc(0.0f, 1.0f, anime.nowTime / anime.duration));
+				anime.ProcessTimeEvents();
 				animations.Add(anime);
 			}
 		}
@@ -65,7 +68,7 @@ public class UIAnimator : MonoBehaviour
 
 	void Update()
 	{
-		if (!enabled)
+		if (!animeEnabled)
 			return;
 		UpdateWithDelta(Time.deltaTime);
 	}
@@ -100,7 +103,7 @@ public class UIAnimator : MonoBehaviour
 		UIAnimator animator = go.AddComponent<UIAnimator>();
 		animator.target = go;
 		animator.AddAnimation(animation);
-		animator.enabled = true;
+		animator.animeEnabled = true;
 		animator.onAllFinished += onAllFinished;
 		return animator;
 	}
@@ -145,14 +148,34 @@ public class UIAnimator : MonoBehaviour
 
 public class UIAnimation
 {
-	public List<UIAnimation> next = new List<UIAnimation>();
-	public delegate void AnimateHandler(float progress);
-	public delegate void OnStartHandler();
-	public delegate void OnFinishHandler();
+	public class TimeEvent {
+		public bool useRateTime;
+		public float time;
+		public Action onTimeEvent;
+		public bool isTriggered;
+		
+		public TimeEvent(bool useRateTime, float time, Action onTimeEvent) {
+			this.useRateTime = useRateTime;
+			this.time = time;
+			this.onTimeEvent = onTimeEvent;
+			isTriggered = false;
+		}
 
-	public AnimateHandler onAnimate;
-	public OnStartHandler onStart;
-	public OnFinishHandler onFinish;
+		public bool IsTimeUp(float nowTime, float duration) {
+			if (!useRateTime) {
+				return nowTime >= time;
+			}
+			return nowTime >= duration * time;
+		}
+	}
+
+	public List<UIAnimation> next = new List<UIAnimation>();
+
+	public Action<float> onAnimate;
+	public Action onStart;
+	public Action onFinish;
+
+	public List<TimeEvent> timeEvents = new List<TimeEvent>();
 	public float duration;
 	public float nowTime;
 	/// <summary>
@@ -204,7 +227,7 @@ public class UIAnimation
 
 	public float remainTime { get { return duration - nowTime; } }
 
-	public UIAnimation(float duration, AnimateHandler onAnimate, 
+	public UIAnimation(float duration, Action<float> onAnimate, 
 		EaseType easeType = EaseType.Linear, UIAnimation next = null)
 	{
 		this.duration = duration;
@@ -212,6 +235,15 @@ public class UIAnimation
 		AddNext(next);
 		SetEaseFunction(easeType);
 		Reset();
+	}
+
+	public void ProcessTimeEvents() {
+		foreach (var timeEvent in timeEvents) {
+			if (!timeEvent.isTriggered && timeEvent.IsTimeUp(nowTime, duration)) {
+				timeEvent.isTriggered = true;
+				timeEvent.onTimeEvent();
+			}
+		}
 	}
 
 	void SetEaseFunction(EaseType easeType)
@@ -298,7 +330,7 @@ public class UIAnimation
 		tempTime = 0.0f;
 	}
 
-	public static UIAnimation TweenAlpha(UIWidget widget, float duration, float from, float to, EaseType easeType = EaseType.Linear, OnStartHandler onStart = null, OnFinishHandler onFinish = null)
+	public static UIAnimation TweenAlpha(UIWidget widget, float duration, float from, float to, EaseType easeType = EaseType.Linear, Action onStart = null, Action onFinish = null)
 	{
 		UIAnimation anime = new UIAnimation(duration, (p) => { widget.alpha = Mathf.Lerp(from, to, p); }, easeType);
 		if (onStart != null)
@@ -308,7 +340,7 @@ public class UIAnimation
 		return anime;
 	}
 
-	public static UIAnimation TweenAlpha(UIPanel widget, float duration, float from, float to, EaseType easeType = EaseType.Linear, OnStartHandler onStart = null, OnFinishHandler onFinish = null)
+	public static UIAnimation TweenAlpha(UIPanel widget, float duration, float from, float to, EaseType easeType = EaseType.Linear, Action onStart = null, Action onFinish = null)
 	{
 		UIAnimation anime = new UIAnimation(duration, (p) => { widget.alpha = Mathf.Lerp(from, to, p); }, easeType);
 		if (onStart != null)
@@ -318,7 +350,7 @@ public class UIAnimation
 		return anime;
 	}
 
-	public static UIAnimation TweenPosition(GameObject widget, float duration, Vector3 from, Vector3 to, EaseType easeType = EaseType.Linear, OnStartHandler onStart = null, OnFinishHandler onFinish = null)
+	public static UIAnimation TweenPosition(GameObject widget, float duration, Vector3 from, Vector3 to, EaseType easeType = EaseType.Linear, Action onStart = null, Action onFinish = null)
 	{
 		UIAnimation anime = new UIAnimation(duration, (p) => { widget.transform.localPosition = Vector3.Lerp(from, to, p); }, easeType);
 		if (onStart != null)
@@ -328,7 +360,7 @@ public class UIAnimation
 		return anime;
 	}
 
-	public static UIAnimation Sleep(float duration, OnStartHandler onStart = null, OnFinishHandler onFinish = null) {
+	public static UIAnimation Sleep(float duration, Action onStart = null, Action onFinish = null) {
 		UIAnimation anime = new UIAnimation(duration, null);
 		if (onStart != null)
 			anime.onStart += onStart;

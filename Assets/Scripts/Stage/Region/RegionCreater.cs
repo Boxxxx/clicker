@@ -12,7 +12,11 @@ namespace Clicker {
 		RegionMeta meta;
 		StageController stageController;
 
-		void Awake() {
+		void Start() {
+
+		}
+
+		public void SetAllPoolSize() {
 			battlePool.SetPoolSize(3);
 			blackSmithPool.SetPoolSize(3);
 		}

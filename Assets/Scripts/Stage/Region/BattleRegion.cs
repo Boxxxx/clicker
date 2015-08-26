@@ -6,6 +6,8 @@ namespace Clicker {
 
 	public class BattleRegion : Region {
 
+		public DamageText damageTextPrefab;
+
 		MonsterDataInst monsterInfo;
 		MonsterAnimation monsterAnime;
 		BattleGenerator battleGenerator;
@@ -46,11 +48,15 @@ namespace Clicker {
 				var record = battleGenerator.GenerateNext();
 				if (record.recordType == BattleRecord.RecordType.Win || record.recordType == BattleRecord.RecordType.OurAtk) {
 					isBattleAnimePlaying = true;
-					var anime = UIAnimation.Sleep(1.0f);
+					var anime = UIAnimation.Sleep(1.5f);
 					anime.onStart = () => {
 						charAnime.anime.CrossFade("ATK2");
 						monsterAnime.anime.CrossFade("Die");
 					};
+					anime.timeEvents.Add(new UIAnimation.TimeEvent(false, 0.7f, ()=> {
+						ShowDamageText(monsterAnime.transform.localPosition + transform.localPosition,
+							"-" + record.damage.ToString());
+					}));
 					anime.onFinish = () => {
 						monsterInfo.hp -= record.damage;
 						if (monsterInfo.hp <= 0) {
@@ -67,10 +73,14 @@ namespace Clicker {
 						charAnime.anime.CrossFade("Damage");
 						monsterAnime.anime.CrossFade("ATK");
 					};
+					anime.timeEvents.Add(new UIAnimation.TimeEvent(false, 0.3f, () => {
+						ShowDamageText(stageController.charAnime.transform.localPosition +
+							stageController.charAnime.anime.transform.localPosition, "-" + record.damage.ToString());
+					}));
 					anime.onFinish = () => {
 						PlayerData.Instance.GetCharacterData().hp -= record.damage;
 						if (PlayerData.Instance.GetCharacterData().hp <= 0) {
-
+							stageController.GameLose();
 						}
 						isBattleAnimePlaying = false;
 						stageController.stageUi.playerStatusUi.Refresh();
@@ -85,6 +95,14 @@ namespace Clicker {
 			isBattleEntered = true;
 			isBattleAnimePlaying = false;
         }
+
+		void ShowDamageText(Vector3 pos, string str) {
+			var text = GameObject.Instantiate<DamageText>(damageTextPrefab);
+			text.transform.parent = stageController.transform;
+			text.transform.localPosition = pos;
+			text.GetComponent<TextMesh>().text = str;
+			text.BeginFloat();
+		}
 
 	}
 

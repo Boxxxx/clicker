@@ -23,9 +23,13 @@ namespace Clicker {
 		}
 
 		public override void RegionUpdate() {
+			if (isTriggered) {
+				return;
+			}
 			if (Input.GetMouseButtonDown(0)) {
 				if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), 100, regionLayer)) {
 					TryUpgradeWeapon();
+					isTriggered = true;
                 }
 			}
 		}

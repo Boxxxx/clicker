@@ -10,10 +10,10 @@ namespace Clicker {
 
 		// Use this for initialization
 		void Start() {
-			BeginFloat();
+
 		}
 
-		void BeginFloat() {
+		public void BeginFloat() {
 			var anime = UIAnimation.TweenPosition(gameObject,
 				floatDuration,
 				transform.localPosition,
