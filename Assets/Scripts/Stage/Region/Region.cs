@@ -27,6 +27,7 @@ namespace Clicker {
 
 	public class RegionMeta {
 		public RegionType type;
+		public int date;
 		/// <summary>
 		/// Only used when type = Monster
 		/// </summary>
@@ -35,7 +36,12 @@ namespace Clicker {
 
 	public enum RegionType {
 		Battle,
-		BlackSmith
+		BlackSmith,
+		ArmorSmith,
+		Tarven,
+		PotionShop,
+		StockMarket,
+		DivineRelic
 	}
 
 }
