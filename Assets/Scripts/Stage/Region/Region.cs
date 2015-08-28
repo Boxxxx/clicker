@@ -11,7 +11,7 @@ namespace Clicker {
 		[Tooltip("A value from 0 to 1 indicating the key point position in region")]
 		public float keyPointPosition = 1.0f;
 
-		public float Length { get { return GameConsts.ScreenWidth * lengthScale; } }
+		public float Length { get { return GameConsts.ScreenWorldWidth * lengthScale; } }
 		public float KeyPointOffset { get { return Length * keyPointPosition; } }
 
 		public TextMesh text;
