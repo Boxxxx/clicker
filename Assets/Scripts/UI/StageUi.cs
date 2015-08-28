@@ -6,6 +6,7 @@ namespace Clicker {
 	public class StageUi : MonoBehaviour {
 
 		public PlayerStatusUi playerStatusUi;
+		public WorldUi worldUi;
 		public UILabel loseLabel;
 
 		// Use this for initialization

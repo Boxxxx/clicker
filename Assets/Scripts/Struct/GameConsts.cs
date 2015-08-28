@@ -4,13 +4,16 @@ using System.Collections;
 namespace Clicker {
 
 	public class GameConsts : MonoBehaviour {
-		public static float ScreenWidth { get { return ScreenHeight * Screen.width / Screen.height; } }
-		public static float ScreenHeight { get { return 2.0f; } }
+		public static float ScreenWorldWidth { get { return ScreenWorldHeight * Screen.width / Screen.height; } }
+		public static float ScreenWorldHeight { get { return 2.0f; } }
 
 		public float characterMoveSpeed;
 		public static float CharacterMoveSpeed { get { return Inst.characterMoveSpeed; } }
 		public float monsterYOffset;
 		public static float MonsterYOffset { get { return Inst.monsterYOffset; } }
+
+		public static int UIScreenWidth = 1920;
+		public static int UIScreenHeight = 1080;
 
 		private static GameConsts instance;
 		public static GameConsts Inst {
