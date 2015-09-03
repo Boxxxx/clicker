@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Utils;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -41,6 +42,10 @@ namespace Clicker.DB {
 			}
 			return null;
 		}
+
+        public string[] GetAllMonsterIds() {
+            return root.monster.Keys.ToArray();
+        }
 
 		public DBPropertyLevel GetAtkProperty(int level) {
 			return root.character.atkLevels[level];

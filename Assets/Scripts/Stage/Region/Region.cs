@@ -32,7 +32,11 @@ namespace Clicker {
 		/// Only used when type = Monster
 		/// </summary>
 		public MonsterDataInst monsterInfo;
-	}
+
+        public override string ToString() {
+            return string.Format("({0}, {1}, {2})", date, type, monsterInfo == null ? "none" : monsterInfo.raw.name);
+        }
+    }
 
 	public enum RegionType {
 		Battle,
