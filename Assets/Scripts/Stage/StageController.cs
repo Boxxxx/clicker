@@ -46,6 +46,7 @@ namespace Clicker {
 			if (currentRegion != null) {
 				currentRegion.RegionUpdate();
 			}
+			stageUi.worldUi.UpdateAll();
 		}
 
 		// TODO(sonicmisoa): move create region logic into another component
