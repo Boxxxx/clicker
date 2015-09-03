@@ -6,6 +6,8 @@ namespace Clicker {
 
 	public class WorldUi : MonoBehaviour {
 
+		public UiLifeBar lifeBarPrefab;
+
 		List<TransformPair> pairs = new List<TransformPair>();
 
 		// Use this for initialization
@@ -18,19 +20,22 @@ namespace Clicker {
 
 		}
 
-		public void CreateLifeBar() {
-
+		public UiLifeBar CreateLifeBar(Transform source) {
+			UiLifeBar go = GameObject.Instantiate<UiLifeBar>(lifeBarPrefab);
+			AddWidgetLink(source, go.transform);
+			return go;
 		}
 
 		public void AddWidgetLink(Transform source, Transform targetWidget) {
 			pairs.Add(new TransformPair(source, targetWidget));
 			targetWidget.parent = transform;
+			targetWidget.localScale = Vector3.one;
 			pairs[pairs.Count - 1].Adjust();
 		}
 
-		public void RemoveWidgetLink(Transform source, Transform targetWidget) {
+		public void RemoveWidgetLink(Transform source) {
 			foreach (var p in pairs) {
-				if (p.source == source && p.target == targetWidget) {
+				if (p.source == source) {
 					pairs.Remove(p);
 					break;
 				}

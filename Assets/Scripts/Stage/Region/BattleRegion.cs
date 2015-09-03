@@ -10,6 +10,7 @@ namespace Clicker {
 
 		MonsterDataInst monsterInfo;
 		MonsterAnimation monsterAnime;
+		UiLifeBar monsterLifeBar;
 		BattleGenerator battleGenerator;
 
 		CharacterAnimation charAnime;
@@ -18,11 +19,14 @@ namespace Clicker {
 
 		public override void Reset(RegionMeta meta, StageController stageController) {
 			monsterInfo = meta.monsterInfo;
+
 			monsterAnime = (GameObject.Instantiate(Resources.Load("Monster/monster_" + monsterInfo.raw.id)) as GameObject).GetComponent<MonsterAnimation>();
 			monsterAnime.gameObject.transform.parent = this.transform;
 			monsterAnime.gameObject.transform.localPosition = new Vector3(1.2f, GameConsts.Inst.monsterYOffset, 0);
-
 			monsterAnime.anime.CrossFade("Idle");
+
+			monsterLifeBar = stageController.stageUi.worldUi.CreateLifeBar(monsterAnime.lifeBarPos);
+			monsterLifeBar.SetHp(monsterInfo.hp, monsterInfo.MaxHp);
 
 			clickArea.gameObject.SetActive(false);
 			text.text = "怪兽区域";
@@ -32,6 +36,11 @@ namespace Clicker {
         }
 
 		public override void Deactive() {
+			if (monsterLifeBar != null) {
+				stageController.stageUi.worldUi.RemoveWidgetLink(monsterAnime.lifeBarPos);
+				GameObject.Destroy(monsterLifeBar.gameObject);
+				monsterLifeBar = null;
+			}
 			if (monsterAnime != null) {
 				GameObject.Destroy(monsterAnime.gameObject);
 				monsterAnime = null;
@@ -54,11 +63,12 @@ namespace Clicker {
 						monsterAnime.anime.CrossFade("Die");
 					};
 					anime.timeEvents.Add(new UIAnimation.TimeEvent(false, 0.7f, ()=> {
+						monsterInfo.hp -= record.damage;
 						ShowDamageText(monsterAnime.transform.localPosition + transform.localPosition,
 							"-" + record.damage.ToString());
+						monsterLifeBar.SetHp(monsterInfo.hp, monsterInfo.MaxHp);
 					}));
 					anime.onFinish = () => {
-						monsterInfo.hp -= record.damage;
 						if (monsterInfo.hp <= 0) {
 							stageController.GoNextRegion();
 						}
@@ -74,11 +84,12 @@ namespace Clicker {
 						monsterAnime.anime.CrossFade("ATK");
 					};
 					anime.timeEvents.Add(new UIAnimation.TimeEvent(false, 0.3f, () => {
+						PlayerData.Instance.GetCharacterData().hp -= record.damage;
 						ShowDamageText(stageController.charAnime.transform.localPosition +
 							stageController.charAnime.anime.transform.localPosition, "-" + record.damage.ToString());
 					}));
 					anime.onFinish = () => {
-						PlayerData.Instance.GetCharacterData().hp -= record.damage;
+						
 						if (PlayerData.Instance.GetCharacterData().hp <= 0) {
 							stageController.GameLose();
 						}
