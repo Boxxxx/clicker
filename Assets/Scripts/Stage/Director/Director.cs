@@ -10,7 +10,12 @@ namespace Clicker {
                 return m_instance;
             }
         }
-        public Director() {
+        void Awake() {
+            if (m_instance != null) {
+                Debug.LogWarning("You should not have two directors in a scene!");
+                Destroy(this);
+                return;
+            }
             m_instance = this;
         }
 
@@ -19,7 +24,7 @@ namespace Clicker {
 
         private int m_date = 0;
         private int m_offset = 0;
-        private List<Pair<int, RegionType>> m_regionList = new List<Pair<int, RegionType>>();
+        private List<RegionMeta> m_regionList = new List<RegionMeta>();
         private Dictionary<RegionType, int> m_regionCountMap = new Dictionary<RegionType, int>();
         private Dictionary<RegionType, int> m_regionLastIndex = new Dictionary<RegionType, int>();
         private Dictionary<RegionType, int> m_regionLastDate = new Dictionary<RegionType, int>();
@@ -44,51 +49,50 @@ namespace Clicker {
             GenerateNextRegions(num - m_regionList.Count);
         }
 
-        public Pair<int, RegionType>[] Forecast(int num) {
+        public RegionMeta[] Forecast(int num) {
             EnsureRegionNum(m_offset + num);
-            var retList = new List<Pair<int, RegionType>>();
+            var retList = new List<RegionMeta>();
             for (int i = 0; i < num; i++) {
                 retList.Add(m_regionList[m_offset + i]);
             }
             return retList.ToArray();
         }
 
-        public Pair<int, RegionType> NextRegion() {
+        public RegionMeta NextRegion() {
             EnsureRegionNum(m_offset + 1);
             var regionData = m_regionList[m_offset++];
-            m_date = regionData.First;
+            m_date = regionData.date;
             return regionData;
         }
 
-        public Pair<int, RegionType>[] NextRegions(int num) {
-            var retList = new List<Pair<int, RegionType>>();
+        public RegionMeta[] NextRegions(int num) {
+            var retList = new List<RegionMeta>();
             for (var i = 0; i < num; i++) {
                 retList.Add(NextRegion());
             }
             return retList.ToArray();
         }
 
-        private RegionType GenerateNextRegion(int index, int currentDate) {
+        private RegionMeta GenerateNextRegion(int index, int currentDate) {
             return regionSelectPolicy.Select(index, currentDate, m_regionList, m_regionCountMap, m_regionLastIndex, m_regionLastDate);
         }
 
-        private Pair<int, RegionType>[] GenerateNextRegions(int num) {
-            var retList = new List<Pair<int, RegionType>>();
+        private RegionMeta[] GenerateNextRegions(int num) {
+            var retList = new List<RegionMeta>();
             int startIndex = m_regionList.Count;
             for (int i = 0; i < num; i++) {
                 int index = startIndex + i;
                 int currentDate = IndexToDate(index);
-                RegionType currentRegion = GenerateNextRegion(index, currentDate);
-                if (!m_regionCountMap.ContainsKey(currentRegion)) {
-                    m_regionCountMap[currentRegion] = 0;
+                RegionMeta currentRegion = GenerateNextRegion(index, currentDate);
+                RegionType regionType = currentRegion.type;
+                if (!m_regionCountMap.ContainsKey(regionType)) {
+                    m_regionCountMap[regionType] = 0;
                 }
-                m_regionCountMap[currentRegion]++;
-                m_regionLastIndex[currentRegion] = index;
-                m_regionLastDate[currentRegion] = currentDate;
-
-                var pair = Pair.Of(currentDate, currentRegion);
-                m_regionList.Add(pair);
-                retList.Add(pair);
+                m_regionCountMap[regionType]++;
+                m_regionLastIndex[regionType] = index;
+                m_regionLastDate[regionType] = currentDate;
+                m_regionList.Add(currentRegion);
+                retList.Add(currentRegion);
             }
             return retList.ToArray();
         }

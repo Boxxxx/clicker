@@ -3,10 +3,10 @@ using FullInspector;
 
 namespace Clicker {
     public abstract class RegionSelectPolicy : BaseBehavior {
-        public abstract RegionType Select(
+        public abstract RegionMeta Select(
             int index,
             int date,
-            List<Pair<int, RegionType>> regionHistory, 
+            List<RegionMeta> regionHistory, 
             Dictionary<RegionType, int> regionCountMap, 
             Dictionary<RegionType, int> regionLastIndex, 
             Dictionary<RegionType, int> regionLastDate);
