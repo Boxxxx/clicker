@@ -25,16 +25,26 @@ namespace Clicker {
 		public virtual void RegionUpdate() { }
 	}
 
+    public class MonsterMeta {
+        public string monsterId;
+        public int level;
+
+        public MonsterMeta(string monsterId, int level) {
+            this.monsterId = monsterId;
+            this.level = level;
+        }
+    }
+
 	public class RegionMeta {
 		public RegionType type;
 		public int date;
-		/// <summary>
-		/// Only used when type = Monster
-		/// </summary>
-		public MonsterDataInst monsterInfo;
+        /// <summary>
+        /// Only used when type = Monster
+        /// </summary>
+        public MonsterMeta monsterMeta;
 
         public override string ToString() {
-            return string.Format("({0}, {1}, {2})", date, type, monsterInfo == null ? "none" : monsterInfo.raw.name);
+            return string.Format("({0}, {1}, {2})", date, type, monsterMeta == null ? "none" : monsterMeta.monsterId);
         }
     }
 
