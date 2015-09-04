@@ -23,6 +23,9 @@ namespace Clicker {
 			hp = MaxHp;
 		}
 
+        public MonsterDataInst(MonsterMeta monsterMeta) 
+            : this(ConstDB.Instance.GetMonsterById(monsterMeta.monsterId), monsterMeta.level) { }
+
 		public int MaxHp { get { return raw.hp; } }
 		public int Atk { get { return raw.atk; } }
 	}

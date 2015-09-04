@@ -62,7 +62,7 @@ namespace Clicker {
 		Region CreateBattleRegion() {
 			RegionMeta meta = new RegionMeta();
 			meta.type = RegionType.Battle;
-			meta.monsterInfo = new MonsterDataInst(ConstDB.Instance.GetMonsterById("1"), 1);
+			meta.monsterMeta = new MonsterMeta("1", 1);
 
 			var region = regionCreater.Create(meta, this);
 			region.transform.parent = transform;
