@@ -14,8 +14,6 @@ namespace Clicker {
 
 		public override void Reset(RegionMeta meta, StageController stageController) {
 			clickArea.gameObject.SetActive(true);
-			clickArea.transform.localPosition = new Vector3(GameConsts.ScreenWorldWidth, 0, 0);
-			clickArea.size = new Vector3(GameConsts.ScreenWorldWidth, GameConsts.ScreenWorldHeight, 0);
 			text.text = "武器升级";
 			isTriggered = false;
 

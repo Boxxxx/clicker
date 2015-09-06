@@ -19,7 +19,7 @@ namespace Clicker {
             m_instance = this;
         }
 
-        public int numOfRegionsPerDay = 5;
+        public int numOfRegionsPerDay = 4;
         public RegionSelectPolicy regionSelectPolicy = null;
 
         private int m_date = 0;
