@@ -18,7 +18,7 @@ namespace Clicker {
 		bool isBattleAnimePlaying;
 
 		public override void Reset(RegionMeta meta, StageController stageController) {
-			monsterInfo = meta.monsterInfo;
+			monsterInfo = new MonsterDataInst(meta.monsterMeta);
 
 			monsterAnime = (GameObject.Instantiate(Resources.Load("Monster/monster_" + monsterInfo.raw.id)) as GameObject).GetComponent<MonsterAnimation>();
 			monsterAnime.gameObject.transform.parent = this.transform;

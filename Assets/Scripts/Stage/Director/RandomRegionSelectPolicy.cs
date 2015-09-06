@@ -86,7 +86,7 @@ namespace Clicker {
         }
         private void PostProcessForBattle(float[] args, RegionMeta regionMeta) {
             var monsterId = Randoms.Default.Range(ConstDB.Instance.GetAllMonsterIds());
-            regionMeta.monsterInfo = new MonsterDataInst(ConstDB.Instance.GetMonsterById(monsterId), 1);
+            regionMeta.monsterMeta = new MonsterMeta(monsterId, 1);
         }
         #endregion
     }
