@@ -5,9 +5,14 @@ using Utils;
 
 namespace Clicker {
     public class RandomRegionSelectPolicy : RegionSelectPolicy {
-        public Dictionary<RegionType, float[]> regionArgs;
-        public delegate float CalculateWeightDelegate(float[] args, int passIndexSinceLast, int passTimeSinceLast);
-        public delegate void PostProcessDelegate(float[] args, RegionMeta regionMeta);
+        [Serializable]
+        public class RegionSelectInfo {
+            public float weight = 0;
+            public float[] args;
+        }
+        public Dictionary<RegionType, RegionSelectInfo> regionArgs;
+        public delegate float CalculateWeightDelegate(RegionSelectInfo info, int passIndexSinceLast, int passTimeSinceLast);
+        public delegate void PostProcessDelegate(RegionSelectInfo info, RegionMeta regionMeta);
 
         private int CurrentDate { get; set; }
         private List<RegionMeta> RegionHistory { get; set; }
@@ -15,13 +20,13 @@ namespace Clicker {
         private Dictionary<RegionType, int> RegionLastIndex { get; set; }
         private Dictionary<RegionType, int> RegionLastDate { get; set; }
 
+        //!TODO(yfiengh): remove this in release version.
+        private RegionSelectInfo _defaultRegionSelectInfo = new RegionSelectInfo();
         private Dictionary<RegionType, CalculateWeightDelegate> m_calculators = new Dictionary<RegionType, CalculateWeightDelegate>();
         private Dictionary<RegionType, PostProcessDelegate> m_postProcesses = new Dictionary<RegionType, PostProcessDelegate>();
 
         public RandomRegionSelectPolicy() {
-            m_calculators.Add(RegionType.Battle, CalculateWeightForBattle);
-            m_calculators.Add(RegionType.BlackSmith, CalculateWeightForBlackSmith);
-            m_postProcesses.Add(RegionType.Battle, PostProcessForBattle);
+            RegisterMethods();
         }
 
         public override RegionMeta Select(
@@ -44,11 +49,11 @@ namespace Clicker {
                 var regionType = pair.Key;
                 var calculator = pair.Value;
 
-                int passIndexSinceLast = regionLastIndex.ContainsKey(regionType) ? index - regionLastIndex[regionType] : -1;
-                int passTimeSinceLast = regionLastDate.ContainsKey(regionType) ? index - regionLastDate[regionType] : -1;
-                var args = regionArgs.ContainsKey(regionType) ? regionArgs[regionType] : null;
+                int passIndexSinceLast = regionLastIndex.ContainsKey(regionType) ? index - regionLastIndex[regionType] : index + 1;
+                int passTimeSinceLast = regionLastDate.ContainsKey(regionType) ? date - regionLastDate[regionType] : date + 1;
+                var regionSelectInfo = regionArgs.ContainsKey(regionType) ? regionArgs[regionType] : _defaultRegionSelectInfo;
 
-                float weight = calculator(args, passIndexSinceLast, passTimeSinceLast);
+                float weight = calculator(regionSelectInfo, passIndexSinceLast, passTimeSinceLast);
                 if (weight == float.MaxValue) {
                     mustSelect.Add(regionType);
                 }
@@ -76,17 +81,118 @@ namespace Clicker {
             return regionMeta;
         }
 
-        #region Weight calculate functions for each RegionType
-        private float CalculateWeightForBattle(float[] args, int passIndexSinceLast, int passTimeSinceLast) {
-            return float.MaxValue;
+        private void RegisterMethods() {
+            // Register calculator methods
+            m_calculators.Add(RegionType.Battle, CalculateWeightForBattle);
+            m_calculators.Add(RegionType.BlackSmith, CalculateWeightForBlackSmith);
+            m_calculators.Add(RegionType.ArmorSmith, CalculateWeightForArmorSmith);
+            m_calculators.Add(RegionType.Tarven, CalculateWeightForTarven);
+            m_calculators.Add(RegionType.PotionShop, CalculateWeightForPotionShop);
+            m_calculators.Add(RegionType.StockMarket, CalculateWeightForStockMarket);
+            m_calculators.Add(RegionType.DivineRelic, CalculateWeightForDivineRelic);
+
+            // Register post process methods
+            m_postProcesses.Add(RegionType.Battle, PostProcessForBattle);
         }
 
-        private float CalculateWeightForBlackSmith(float[] args, int passIndexSinceLast, int passTimeSinceLast) {
-            return float.MaxValue;
+        #region Methods for each RegionType
+        private float CalculateWeightForBattle(RegionSelectInfo info, int passIndexSinceLast, int passTimeSinceLast) {
+            int cntOfSame = GetCountOfSameRegionAtTail(RegionType.Battle);
+            // no continuous 4 battle
+            if (cntOfSame >= 3) {
+                return 0;
+            }
+            return info.weight;
         }
-        private void PostProcessForBattle(float[] args, RegionMeta regionMeta) {
+
+        private float CalculateWeightForBlackSmith(RegionSelectInfo info, int passIndexSinceLast, int passTimeSinceLast) {
+            float weight = info.weight;
+
+            if (passIndexSinceLast > info.args[0]) {
+                weight *= passIndexSinceLast - info.args[0] + 1;
+            }
+
+            int cntOfSmith = GetCountOfSmithAtTail();
+            // no continuous 3 black smith
+            if (cntOfSmith >= 2) {
+                return 0;
+            }
+            else if (cntOfSmith == 1) {
+                weight *= 0.25f;
+            }
+
+            return weight;
+        }
+
+        private float CalculateWeightForArmorSmith(RegionSelectInfo info, int passIndexSinceLast, int passTimeSinceLast) {
+            float weight = info.weight;
+
+            if (passIndexSinceLast > info.args[0]) {
+                weight *= passIndexSinceLast - info.args[0] + 1;
+            }
+
+            int cntOfSmith = GetCountOfSmithAtTail();
+            // no continuous 3 armor smith
+            if (cntOfSmith >= 2) {
+                return 0;
+            }
+            else if (cntOfSmith == 1) {
+                weight *= 0.25f;
+            }
+
+            return weight;
+        }
+
+        private float CalculateWeightForTarven(RegionSelectInfo info, int passIndexSinceLast, int passTimeSinceLast) {
+            if (passIndexSinceLast >= info.args[0]) {
+                return float.MaxValue;
+            }
+            return info.weight;
+        }
+
+        private float CalculateWeightForPotionShop(RegionSelectInfo info, int passIndexSinceLast, int passTimeSinceLast) {
+            return info.weight;
+        }
+
+        private float CalculateWeightForStockMarket(RegionSelectInfo info, int passIndexSinceLast, int passTimeSinceLast) {
+            return info.weight;
+        }
+
+        private float CalculateWeightForDivineRelic(RegionSelectInfo info, int passIndexSinceLast, int passTimeSinceLast) {
+            return info.weight;
+        }
+
+        private void PostProcessForBattle(RegionSelectInfo info, RegionMeta regionMeta) {
             var monsterId = Randoms.Default.Range(ConstDB.Instance.GetAllMonsterIds());
             regionMeta.monsterMeta = new MonsterMeta(monsterId, 1);
+        }
+        #endregion
+
+        #region Utility
+        private int GetCountOfSameRegionAtTail(RegionType regionType) {
+            int cnt = 0;
+            for (int i = RegionHistory.Count - 1; i >= 0; i--) {
+                if (RegionHistory[i].type == regionType) {
+                    cnt++;
+                }
+                else {
+                    break;
+                }
+            }
+            return cnt;
+        }
+
+        private int GetCountOfSmithAtTail() {
+            int cnt = 0;
+            for (int i = RegionHistory.Count - 1; i >= 0; i--) {
+                if (RegionHistory[i].type == RegionType.BlackSmith || RegionHistory[i].type == RegionType.ArmorSmith) {
+                    cnt++;
+                }
+                else {
+                    break;
+                }
+            }
+            return cnt;
         }
         #endregion
     }
