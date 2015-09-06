@@ -15,6 +15,17 @@ namespace Clicker {
 		public int gold = 0;
 		public ItemType itemType = ItemType.None;
 
+		public float currentLifeTime = 0;
+
+		public float RemainingLifePercent {
+			get {
+				if (currentLifeTime >= ConstDB.Instance.GetCharLifeTime()) {
+					return 0.0f;
+				}
+				return 1.0f - currentLifeTime / ConstDB.Instance.GetCharLifeTime();
+			}
+		}
+
 		public CharacterDataInst() {
 
 		}
@@ -27,6 +38,7 @@ namespace Clicker {
 			atkLevel = other.atkLevel;
 			gold = other.gold;
 			itemType = other.itemType;
+			currentLifeTime = other.currentLifeTime;
 		}
 
 		public void SetAtkLevel(int level) {
