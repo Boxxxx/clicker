@@ -9,6 +9,7 @@ namespace Clicker {
 		public ReusePool battlePool;
 		public ReusePool blackSmithPool;
 		public ReusePool armorSmithPool;
+		public ReusePool tarvenPool;
 
 		RegionMeta meta;
 		StageController stageController;
@@ -21,6 +22,7 @@ namespace Clicker {
 			battlePool.SetPoolSize(3);
 			blackSmithPool.SetPoolSize(3);
 			armorSmithPool.SetPoolSize(3);
+			tarvenPool.SetPoolSize(3);
 		}
 
 		public Region Create(RegionMeta meta, StageController stageController) {
@@ -36,6 +38,9 @@ namespace Clicker {
 					break;
 				case RegionType.ArmorSmith:
 					ret = CreateArmorSmith();
+					break;
+				case RegionType.Tarven:
+					ret = CreateTarvenRegion();
                     break;
 			}
 			return ret;
@@ -55,6 +60,12 @@ namespace Clicker {
 
 		ArmorSmithRegion CreateArmorSmith() {
 			ArmorSmithRegion ret = armorSmithPool.Allocate<ArmorSmithRegion>();
+			ret.Reset(meta, stageController);
+			return ret;
+		}
+
+		TarvenRegion CreateTarvenRegion() {
+			TarvenRegion ret = tarvenPool.Allocate<TarvenRegion>();
 			ret.Reset(meta, stageController);
 			return ret;
 		}

@@ -81,7 +81,11 @@ namespace Clicker.DB {
 
 		public int GetDefToNextLevelGold(int level) {
 			return root.cost.defLevelUp[level];
-		} 
+		}
+
+		public int GetLifeSpanRestoreGold() {
+			return root.cost.lifeSpanRestore;
+		}
 
 	}
 
@@ -112,6 +116,7 @@ namespace Clicker.DB {
 	public class DBCost {
 		public List<int> atkLevelUp = new List<int>();
 		public List<int> defLevelUp = new List<int>();
+		public int lifeSpanRestore = 0;
 	}
 
 	public class DBPropertyLevel {

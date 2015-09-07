@@ -1,22 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 namespace Clicker {
 
-	public class BlackSmithRegion : OnceClickRegion {
+	public class TarvenRegion : OnceClickRegion {
 
 		public override void Reset(RegionMeta meta, StageController stageController) {
 			base.Reset(meta, stageController);
-			text.text = "武器升级";
+			text.text = "回复区域";
 		}
 
 		protected override void OnClick() {
-			if (!DB.PlayerDataHelper.CanUpgradeWeapon()) {
+			if (!DB.PlayerDataHelper.CanRestoreLifeSpan()) {
 				return;
 			}
-			DB.PlayerDataHelper.UpgradeWeapon();
+			DB.PlayerDataHelper.RestoreLifeSpan();
 			stageController.stageUi.playerStatusUi.Refresh();
 		}
 
 	}
+
 }

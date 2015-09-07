@@ -46,6 +46,9 @@ namespace Clicker {
 			// Process life time
 			PlayerData.Instance.GetCharacterData().currentLifeTime += Time.deltaTime;
 			stageUi.playerStatusUi.RefreshLifeSpan();
+			if (PlayerDataHelper.IsPlayerLifeOver()) {
+				GameLose();
+			}
 
 			if (currentRegion != null) {
 				currentRegion.RegionUpdate();
@@ -56,12 +59,14 @@ namespace Clicker {
 		// TODO(sonicmisoa): move create region logic into another component
 		Region CreateNextRegion() {
 			regionCount++;
-			if (regionCount % 3 == 1) {
+			if (regionCount % 4 == 1) {
 				return CreateBattleRegion();
-			} else if (regionCount % 3 == 2) {
+			} else if (regionCount % 4 == 2) {
 				return CreateBlackSmithRegion();
-			} else {
+			} else if (regionCount % 4 == 3) {
 				return CreateArmorSmithRegion();
+			} else {
+				return CreateTarvenRegion();
 			}
 		}
 
@@ -89,6 +94,16 @@ namespace Clicker {
 		Region CreateArmorSmithRegion() {
 			RegionMeta meta = new RegionMeta();
 			meta.type = RegionType.ArmorSmith;
+
+			var region = regionCreater.Create(meta, this);
+			region.transform.parent = transform;
+
+			return region;
+		}
+
+		Region CreateTarvenRegion() {
+			RegionMeta meta = new RegionMeta();
+			meta.type = RegionType.Tarven;
 
 			var region = regionCreater.Create(meta, this);
 			region.transform.parent = transform;

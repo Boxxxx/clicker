@@ -71,6 +71,7 @@ namespace Clicker {
 					anime.onFinish = () => {
 						if (monsterInfo.hp <= 0) {
 							stageController.GoNextRegion();
+							PlayerData.CharcterData.gold += monsterInfo.raw.goldDrop;
 						}
 						isBattleAnimePlaying = false;
 						stageController.stageUi.playerStatusUi.Refresh();

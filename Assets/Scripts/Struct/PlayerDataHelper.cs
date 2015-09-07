@@ -33,6 +33,28 @@ namespace Clicker.DB {
 			pData.SetDefLevel(pData.defLevel + 1);
 		}
 
+		public static bool CanRestoreLifeSpan() {
+			var pData = PlayerData.Instance.GetCharacterData();
+			if (pData.gold >= ConstDB.Instance.GetLifeSpanRestoreGold()) {
+				return true;
+			}
+			return false;
+		}
+
+		public static void RestoreLifeSpan() {
+			var pData = PlayerData.Instance.GetCharacterData();
+			pData.gold -= ConstDB.Instance.GetLifeSpanRestoreGold();
+			pData.currentLifeTime = 0.0f;
+        }
+
+		public static bool IsPlayerLifeOver() {
+			var pData = PlayerData.Instance.GetCharacterData();
+			if (pData.currentLifeTime >= ConstDB.Instance.GetCharLifeTime()) {
+				return true;
+			}
+			return false;
+		}
+
 	}
 
 }
