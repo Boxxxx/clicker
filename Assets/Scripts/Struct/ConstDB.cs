@@ -87,6 +87,10 @@ namespace Clicker.DB {
 			return root.cost.lifeSpanRestore;
 		}
 
+		public int GetPurchasePotionGold() {
+			return root.cost.potion;
+		}
+
 	}
 
 	public class DBRoot {
@@ -117,6 +121,7 @@ namespace Clicker.DB {
 		public List<int> atkLevelUp = new List<int>();
 		public List<int> defLevelUp = new List<int>();
 		public int lifeSpanRestore = 0;
+		public int potion = 0;
 	}
 
 	public class DBPropertyLevel {

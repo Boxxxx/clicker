@@ -74,6 +74,7 @@
       400,
       500
     ],
-    "lifeSpanRestore": 100
+    "lifeSpanRestore": 100,
+    "potion": 50
   }
 }

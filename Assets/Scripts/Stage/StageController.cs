@@ -58,15 +58,18 @@ namespace Clicker {
 
 		// TODO(sonicmisoa): move create region logic into another component
 		Region CreateNextRegion() {
+			int regionTotalCount = 5;
 			regionCount++;
-			if (regionCount % 4 == 1) {
+			if (regionCount % regionTotalCount == 1) {
 				return CreateBattleRegion();
-			} else if (regionCount % 4 == 2) {
-				return CreateBlackSmithRegion();
-			} else if (regionCount % 4 == 3) {
-				return CreateArmorSmithRegion();
+			} else if (regionCount % regionTotalCount == 2) {
+				return CreateOnceClickRegion(RegionType.BlackSmith);
+			} else if (regionCount % regionTotalCount == 3) {
+				return CreateOnceClickRegion(RegionType.ArmorSmith);
+			} else if (regionCount % regionTotalCount == 4){
+				return CreateOnceClickRegion(RegionType.Tarven);
 			} else {
-				return CreateTarvenRegion();
+				return CreateOnceClickRegion(RegionType.PotionShop);
 			}
 		}
 
@@ -81,29 +84,9 @@ namespace Clicker {
 			return region;
 		}
 
-		Region CreateBlackSmithRegion() {
+		Region CreateOnceClickRegion(RegionType regionType) {
 			RegionMeta meta = new RegionMeta();
-			meta.type = RegionType.BlackSmith;
-
-			var region = regionCreater.Create(meta, this);
-			region.transform.parent = transform;
-
-			return region;
-		}
-
-		Region CreateArmorSmithRegion() {
-			RegionMeta meta = new RegionMeta();
-			meta.type = RegionType.ArmorSmith;
-
-			var region = regionCreater.Create(meta, this);
-			region.transform.parent = transform;
-
-			return region;
-		}
-
-		Region CreateTarvenRegion() {
-			RegionMeta meta = new RegionMeta();
-			meta.type = RegionType.Tarven;
+			meta.type = regionType;
 
 			var region = regionCreater.Create(meta, this);
 			region.transform.parent = transform;

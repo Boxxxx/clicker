@@ -55,6 +55,30 @@ namespace Clicker.DB {
 			return false;
 		}
 
+		public static void UseCurrentItem() {
+			var pData = PlayerData.CharcterData;
+			switch (pData.itemType) {
+				case ItemType.Potion:
+					pData.hp = pData.maxHp;
+					pData.itemType = ItemType.None;
+					break;
+			}
+		}
+
+		public static bool CanBuyPotion() {
+			var pData = PlayerData.Instance.GetCharacterData();
+			if (pData.itemType == ItemType.Potion) {
+				return false;
+			}
+			return pData.gold >= ConstDB.Instance.GetPurchasePotionGold();
+		}
+
+		public static void BuyPotion() {
+			var pData = PlayerData.Instance.GetCharacterData();
+			pData.itemType = ItemType.Potion;
+			pData.gold -= ConstDB.Instance.GetPurchasePotionGold();
+		}
+
 	}
 
 }
