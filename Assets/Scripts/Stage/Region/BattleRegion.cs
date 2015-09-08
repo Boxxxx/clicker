@@ -17,6 +17,12 @@ namespace Clicker {
 		bool isBattleEntered;
 		bool isBattleAnimePlaying;
 
+		protected int regionLayer {
+			get {
+				return 1 << LayerMask.NameToLayer("Region");
+			}
+		}
+
 		public override void Reset(RegionMeta meta, StageController stageController) {
 			monsterInfo = new MonsterDataInst(meta.monsterMeta);
 
@@ -28,7 +34,7 @@ namespace Clicker {
 			monsterLifeBar = stageController.stageUi.worldUi.CreateLifeBar(monsterAnime.lifeBarPos);
 			monsterLifeBar.SetHp(monsterInfo.hp, monsterInfo.MaxHp);
 
-			clickArea.gameObject.SetActive(false);
+			clickArea.gameObject.SetActive(true);
 			text.text = "怪兽区域";
 			this.stageController = stageController;
 			charAnime = stageController.charAnime;
@@ -49,10 +55,17 @@ namespace Clicker {
 		}
 
 		public override void RegionUpdate() {
+			// Let player use item at this time
+			if (PlayerData.CharcterData.itemType != ItemType.None && Input.GetMouseButtonDown(0)) {
+				if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), 100, regionLayer)) {
+					Debug.Log("Use Item!");
+					PlayerDataHelper.UseCurrentItem();
+					stageController.stageUi.playerStatusUi.Refresh();
+				}
+			}
 			if (!isBattleEntered) {
 				return;
 			}
-
 			if (!isBattleAnimePlaying) {
 				var record = battleGenerator.GenerateNext();
 				if (record.recordType == BattleRecord.RecordType.Win || record.recordType == BattleRecord.RecordType.OurAtk) {
@@ -71,6 +84,7 @@ namespace Clicker {
 					anime.onFinish = () => {
 						if (monsterInfo.hp <= 0) {
 							stageController.GoNextRegion();
+							PlayerData.CharcterData.gold += monsterInfo.raw.goldDrop;
 						}
 						isBattleAnimePlaying = false;
 						stageController.stageUi.playerStatusUi.Refresh();

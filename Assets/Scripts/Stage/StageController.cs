@@ -43,6 +43,13 @@ namespace Clicker {
 		}
 
 		void Update() {
+			// Process life time
+			PlayerData.Instance.GetCharacterData().currentLifeTime += Time.deltaTime;
+			stageUi.playerStatusUi.RefreshLifeSpan();
+			if (PlayerDataHelper.IsPlayerLifeOver()) {
+				GameLose();
+			}
+
 			if (currentRegion != null) {
 				currentRegion.RegionUpdate();
 			}
@@ -51,11 +58,18 @@ namespace Clicker {
 
 		// TODO(sonicmisoa): move create region logic into another component
 		Region CreateNextRegion() {
+			int regionTotalCount = 5;
 			regionCount++;
-			if (regionCount % 2 == 1) {
+			if (regionCount % regionTotalCount == 1) {
 				return CreateBattleRegion();
+			} else if (regionCount % regionTotalCount == 2) {
+				return CreateOnceClickRegion(RegionType.BlackSmith);
+			} else if (regionCount % regionTotalCount == 3) {
+				return CreateOnceClickRegion(RegionType.ArmorSmith);
+			} else if (regionCount % regionTotalCount == 4){
+				return CreateOnceClickRegion(RegionType.Tarven);
 			} else {
-				return CreateBlackSmithRegion();
+				return CreateOnceClickRegion(RegionType.PotionShop);
 			}
 		}
 
@@ -70,9 +84,9 @@ namespace Clicker {
 			return region;
 		}
 
-		Region CreateBlackSmithRegion() {
+		Region CreateOnceClickRegion(RegionType regionType) {
 			RegionMeta meta = new RegionMeta();
-			meta.type = RegionType.BlackSmith;
+			meta.type = regionType;
 
 			var region = regionCreater.Create(meta, this);
 			region.transform.parent = transform;

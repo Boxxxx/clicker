@@ -3,18 +3,18 @@ using System.Collections;
 
 namespace Clicker {
 
-	public class BlackSmithRegion : OnceClickRegion {
+	public class ArmorSmithRegion : OnceClickRegion {
 
 		public override void Reset(RegionMeta meta, StageController stageController) {
 			base.Reset(meta, stageController);
-			text.text = "武器升级";
+			text.text = "防具升级";
 		}
 
 		protected override void OnClick() {
-			if (!DB.PlayerDataHelper.CanUpgradeWeapon()) {
+			if (!DB.PlayerDataHelper.CanUpgradeArmor()) {
 				return;
 			}
-			DB.PlayerDataHelper.UpgradeWeapon();
+			DB.PlayerDataHelper.UpgradeArmor();
 			stageController.stageUi.playerStatusUi.Refresh();
 		}
 

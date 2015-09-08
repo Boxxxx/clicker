@@ -27,11 +27,6 @@ namespace Clicker {
 		void Awake() {
 			barMaxLength = bar.width;
 		}
-
-		// Update is called once per frame
-		void Update() {
-
-		}
 	}
 
 }

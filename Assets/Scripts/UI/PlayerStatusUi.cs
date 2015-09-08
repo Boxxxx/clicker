@@ -9,6 +9,7 @@ namespace Clicker {
 		public UILabel labelAtk;
 		public UILabel labelGold;
 		public UISprite spriteItem;
+		public UiLifeSpan uiLifeSpan;
 
 		public void Refresh() {
 			CharacterDataInst info = DB.PlayerData.Instance.GetCharacterData();
@@ -30,6 +31,14 @@ namespace Clicker {
 					spriteItem.spriteName = "cash";
 					break;
 			}
+
+
+			RefreshLifeSpan();
+		}
+
+		public void RefreshLifeSpan() {
+			CharacterDataInst info = DB.PlayerData.Instance.GetCharacterData();
+			uiLifeSpan.SetLifeSpanPercent(info.RemainingLifePercent);
 		}
 
 		// Use this for initialization

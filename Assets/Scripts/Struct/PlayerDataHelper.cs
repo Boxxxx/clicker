@@ -33,6 +33,52 @@ namespace Clicker.DB {
 			pData.SetDefLevel(pData.defLevel + 1);
 		}
 
+		public static bool CanRestoreLifeSpan() {
+			var pData = PlayerData.Instance.GetCharacterData();
+			if (pData.gold >= ConstDB.Instance.GetLifeSpanRestoreGold()) {
+				return true;
+			}
+			return false;
+		}
+
+		public static void RestoreLifeSpan() {
+			var pData = PlayerData.Instance.GetCharacterData();
+			pData.gold -= ConstDB.Instance.GetLifeSpanRestoreGold();
+			pData.currentLifeTime = 0.0f;
+        }
+
+		public static bool IsPlayerLifeOver() {
+			var pData = PlayerData.Instance.GetCharacterData();
+			if (pData.currentLifeTime >= ConstDB.Instance.GetCharLifeTime()) {
+				return true;
+			}
+			return false;
+		}
+
+		public static void UseCurrentItem() {
+			var pData = PlayerData.CharcterData;
+			switch (pData.itemType) {
+				case ItemType.Potion:
+					pData.hp = pData.maxHp;
+					pData.itemType = ItemType.None;
+					break;
+			}
+		}
+
+		public static bool CanBuyPotion() {
+			var pData = PlayerData.Instance.GetCharacterData();
+			if (pData.itemType == ItemType.Potion) {
+				return false;
+			}
+			return pData.gold >= ConstDB.Instance.GetPurchasePotionGold();
+		}
+
+		public static void BuyPotion() {
+			var pData = PlayerData.Instance.GetCharacterData();
+			pData.itemType = ItemType.Potion;
+			pData.gold -= ConstDB.Instance.GetPurchasePotionGold();
+		}
+
 	}
 
 }

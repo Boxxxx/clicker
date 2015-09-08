@@ -14,6 +14,11 @@ namespace Clicker.DB {
 				return instance;
 			}
 		}
+		public static CharacterDataInst CharcterData {
+			get {
+				return Instance.GetCharacterData();
+			}
+		}
 
 		private CharacterDataInst characterData = new CharacterDataInst();
 

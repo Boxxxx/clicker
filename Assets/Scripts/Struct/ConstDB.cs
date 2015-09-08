@@ -59,6 +59,10 @@ namespace Clicker.DB {
 			return root.character.priority;
 		}
 
+		public float GetCharLifeTime() {
+			return root.character.lifeTime;
+		}
+
 		public double GetCharDoubleHitPossibility() {
 			return root.character.doubleHitPossibility;
 		}
@@ -77,7 +81,15 @@ namespace Clicker.DB {
 
 		public int GetDefToNextLevelGold(int level) {
 			return root.cost.defLevelUp[level];
-		} 
+		}
+
+		public int GetLifeSpanRestoreGold() {
+			return root.cost.lifeSpanRestore;
+		}
+
+		public int GetPurchasePotionGold() {
+			return root.cost.potion;
+		}
 
 	}
 
@@ -102,17 +114,19 @@ namespace Clicker.DB {
 		public List<DBPropertyLevel> defLevels = new List<DBPropertyLevel>();
 		public int priority = 0;
 		public double doubleHitPossibility = 0;
+		public float lifeTime = 0.0f;
 	}
 
 	public class DBCost {
 		public List<int> atkLevelUp = new List<int>();
 		public List<int> defLevelUp = new List<int>();
+		public int lifeSpanRestore = 0;
+		public int potion = 0;
 	}
 
 	public class DBPropertyLevel {
 		public int level = 0;
 		public int value = 0;
-		public int goldToNext = 0;
 	}
 
 }
