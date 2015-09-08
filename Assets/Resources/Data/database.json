@@ -75,6 +75,8 @@
       500
     ],
     "lifeSpanRestore": 100,
-    "potion": 50
+    "potion": 50,
+    "stock": 150,
+    "divineReaper": 200
   }
 }

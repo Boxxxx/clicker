@@ -76,15 +76,29 @@ namespace Clicker {
 						monsterAnime.anime.CrossFade("Die");
 					};
 					anime.timeEvents.Add(new UIAnimation.TimeEvent(false, 0.7f, ()=> {
-						monsterInfo.hp -= record.damage;
+						int damage = record.damage;
+						if (PlayerData.CharcterData.isDivineReaperUsed) {
+							damage *= 100;
+							PlayerData.CharcterData.isDivineReaperUsed = false;
+						}
+						monsterInfo.hp -= damage;
+						if (monsterInfo.hp <= 0) {
+							// Disable item use when monster is dead
+							clickArea.gameObject.SetActive(false);
+						}
 						ShowDamageText(monsterAnime.transform.localPosition + transform.localPosition,
-							"-" + record.damage.ToString());
+							"-" + damage.ToString());
 						monsterLifeBar.SetHp(monsterInfo.hp, monsterInfo.MaxHp);
 					}));
 					anime.onFinish = () => {
 						if (monsterInfo.hp <= 0) {
 							stageController.GoNextRegion();
-							PlayerData.CharcterData.gold += monsterInfo.raw.goldDrop;
+							if (PlayerData.CharcterData.isStockUsed) {
+								PlayerData.CharcterData.gold += monsterInfo.raw.goldDrop + 5000;
+								PlayerData.CharcterData.isStockUsed = false;
+							} else {
+								PlayerData.CharcterData.gold += monsterInfo.raw.goldDrop;
+							}
 						}
 						isBattleAnimePlaying = false;
 						stageController.stageUi.playerStatusUi.Refresh();

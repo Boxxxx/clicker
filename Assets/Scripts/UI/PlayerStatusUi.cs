@@ -27,7 +27,7 @@ namespace Clicker {
 				case ItemType.DivineReaper:
 					spriteItem.spriteName = "divine_reaper";
 					break;
-				case ItemType.Cash:
+				case ItemType.Stock:
 					spriteItem.spriteName = "cash";
 					break;
 			}

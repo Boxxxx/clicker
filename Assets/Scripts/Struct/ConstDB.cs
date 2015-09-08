@@ -91,6 +91,14 @@ namespace Clicker.DB {
 			return root.cost.potion;
 		}
 
+		public int GetPurchaseStockGold() {
+			return root.cost.stock;
+		}
+
+		public int GetPurchaseDivineReaperGold() {
+			return root.cost.divineReaper;
+		}
+
 	}
 
 	public class DBRoot {
@@ -122,6 +130,8 @@ namespace Clicker.DB {
 		public List<int> defLevelUp = new List<int>();
 		public int lifeSpanRestore = 0;
 		public int potion = 0;
+		public int stock = 0;
+		public int divineReaper = 0;
 	}
 
 	public class DBPropertyLevel {

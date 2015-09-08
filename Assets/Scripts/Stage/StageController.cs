@@ -58,18 +58,18 @@ namespace Clicker {
 
 		// TODO(sonicmisoa): move create region logic into another component
 		Region CreateNextRegion() {
-			int regionTotalCount = 5;
+			int regionTotalCount = 3;
 			regionCount++;
 			if (regionCount % regionTotalCount == 1) {
 				return CreateBattleRegion();
 			} else if (regionCount % regionTotalCount == 2) {
-				return CreateOnceClickRegion(RegionType.BlackSmith);
+				return CreateOnceClickRegion(RegionType.DivineRelic);
 			} else if (regionCount % regionTotalCount == 3) {
-				return CreateOnceClickRegion(RegionType.ArmorSmith);
+				return CreateOnceClickRegion(RegionType.DivineRelic);
 			} else if (regionCount % regionTotalCount == 4){
 				return CreateOnceClickRegion(RegionType.Tarven);
 			} else {
-				return CreateOnceClickRegion(RegionType.PotionShop);
+				return CreateOnceClickRegion(RegionType.StockMarket);
 			}
 		}
 

@@ -16,6 +16,8 @@ namespace Clicker {
 		public ItemType itemType = ItemType.None;
 
 		public float currentLifeTime = 0;
+		public bool isDivineReaperUsed = false;
+		public bool isStockUsed = false;
 
 		public float RemainingLifePercent {
 			get {
@@ -39,6 +41,8 @@ namespace Clicker {
 			gold = other.gold;
 			itemType = other.itemType;
 			currentLifeTime = other.currentLifeTime;
+			isDivineReaperUsed = other.isDivineReaperUsed;
+			isStockUsed = other.isStockUsed;
 		}
 
 		public void SetAtkLevel(int level) {
@@ -59,6 +63,6 @@ namespace Clicker {
 		None,
 		Potion,
 		DivineReaper,
-		Cash
+		Stock
 	}
 }

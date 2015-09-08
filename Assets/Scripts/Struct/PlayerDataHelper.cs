@@ -45,7 +45,7 @@ namespace Clicker.DB {
 			var pData = PlayerData.Instance.GetCharacterData();
 			pData.gold -= ConstDB.Instance.GetLifeSpanRestoreGold();
 			pData.currentLifeTime = 0.0f;
-        }
+		}
 
 		public static bool IsPlayerLifeOver() {
 			var pData = PlayerData.Instance.GetCharacterData();
@@ -60,6 +60,14 @@ namespace Clicker.DB {
 			switch (pData.itemType) {
 				case ItemType.Potion:
 					pData.hp = pData.maxHp;
+					pData.itemType = ItemType.None;
+					break;
+				case ItemType.Stock:
+					pData.isStockUsed = true;
+					pData.itemType = ItemType.None;
+					break;
+				case ItemType.DivineReaper:
+					pData.isDivineReaperUsed = true;
 					pData.itemType = ItemType.None;
 					break;
 			}
@@ -77,6 +85,34 @@ namespace Clicker.DB {
 			var pData = PlayerData.Instance.GetCharacterData();
 			pData.itemType = ItemType.Potion;
 			pData.gold -= ConstDB.Instance.GetPurchasePotionGold();
+		}
+
+		public static bool CanBuyStock() {
+			var pData = PlayerData.CharcterData;
+			if (pData.itemType == ItemType.Stock) {
+				return false;
+			}
+			return pData.gold >= ConstDB.Instance.GetPurchaseStockGold();
+		}
+
+		public static void BuyStock() {
+			var pData = PlayerData.CharcterData;
+			pData.itemType = ItemType.Stock;
+			pData.gold -= ConstDB.Instance.GetPurchaseStockGold();
+		}
+
+		public static bool CanBuyDivineReaper() {
+			var pData = PlayerData.CharcterData;
+			if (pData.itemType == ItemType.DivineReaper) {
+				return false;
+			}
+			return pData.gold >= ConstDB.Instance.GetPurchaseDivineReaperGold();
+		}
+
+		public static void BuyDivineReaper() {
+			var pData = PlayerData.CharcterData;
+			pData.itemType = ItemType.DivineReaper;
+			pData.gold -= ConstDB.Instance.GetPurchaseDivineReaperGold();
 		}
 
 	}
