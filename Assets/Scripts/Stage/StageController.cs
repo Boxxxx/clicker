@@ -56,22 +56,18 @@ namespace Clicker {
 			stageUi.worldUi.UpdateAll();
 		}
 
-		// TODO(sonicmisoa): move create region logic into another component
 		Region CreateNextRegion() {
-			int regionTotalCount = 3;
-			regionCount++;
-			if (regionCount % regionTotalCount == 1) {
-				return CreateBattleRegion();
-			} else if (regionCount % regionTotalCount == 2) {
-				return CreateOnceClickRegion(RegionType.DivineRelic);
-			} else if (regionCount % regionTotalCount == 3) {
-				return CreateOnceClickRegion(RegionType.DivineRelic);
-			} else if (regionCount % regionTotalCount == 4){
-				return CreateOnceClickRegion(RegionType.Tarven);
-			} else {
-				return CreateOnceClickRegion(RegionType.StockMarket);
-			}
+            var regionMeta = Director.Instance.NextRegion();
+            Debug.Log("[StageController] Next region is " + regionMeta.type);
+            return CreateRegion(regionMeta);
 		}
+
+        Region CreateRegion(RegionMeta meta) {
+            var region = regionCreater.Create(meta, this);
+            region.transform.parent = transform;
+
+            return region;
+        }
 
 		Region CreateBattleRegion() {
 			RegionMeta meta = new RegionMeta();
