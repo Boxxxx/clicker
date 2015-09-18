@@ -46,15 +46,13 @@ namespace Clicker {
 		}
 
 		public void SetAtkLevel(int level) {
-			var property = ConstDB.Instance.GetAtkProperty(level);
 			atkLevel = level;
-			atk = property.value;
+			atk = ConstDB.GetPropertyValue(ConstDB.Instance.GetCharacter().atkLevels, level);
 		}
 
 		public void SetDefLevel(int level) {
-			var property = ConstDB.Instance.GetDefProperty(level);
 			defLevel = level;
-			maxHp = property.value;
+			maxHp = ConstDB.GetPropertyValue(ConstDB.Instance.GetCharacter().defLevels, level);
 			hp = maxHp;
 		}
 	}

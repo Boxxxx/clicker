@@ -47,6 +47,10 @@ namespace Clicker.DB {
             return root.monster.Keys.ToArray();
         }
 
+		public DBCharacter GetCharacter() {
+			return root.character;
+		}
+
 		public DBPropertyLevel GetAtkProperty(int level) {
 			return root.character.atkLevels[level];
 		}
@@ -99,6 +103,25 @@ namespace Clicker.DB {
 			return root.cost.divineReaper;
 		}
 
+		static public int GetPropertyValue(List<DBPropertyLevel> list, int level) {
+			DBPropertyLevel lastItem = null;
+			foreach (var item in list) {
+				if (item.level == level) {
+					return item.value;
+				}
+				if (lastItem == null) {
+					lastItem = item;
+					continue;
+				}
+				if (level <= item.level && level >= lastItem.level) {
+					return Mathf.RoundToInt(Mathf.Lerp(lastItem.value, item.value,
+						Mathf.InverseLerp(lastItem.level, item.level, level)));
+				}
+				lastItem = item;
+			}
+			return -1;
+		}
+
 	}
 
 	public class DBRoot {
@@ -109,12 +132,13 @@ namespace Clicker.DB {
 
 	public class DBMonster {
 		public string id = "-1";
-		public int hp = 0;
-		public int atk = 0;
 		public string name = "None";
 		public int priority = 0;
 		public double doubleHitPossibility = 0;
-		public int goldDrop = 0;
+
+		public List<DBPropertyLevel> hp = new List<DBPropertyLevel>();
+		public List<DBPropertyLevel> atk = new List<DBPropertyLevel>();
+		public List<DBPropertyLevel> goldDrop = new List<DBPropertyLevel>();
 	}
 
 	public class DBCharacter {
