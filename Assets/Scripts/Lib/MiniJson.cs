@@ -459,7 +459,8 @@ namespace MiniJSON
                 if (dataList != null)
                 {
                     Type listType = asList.GetType();
-                    if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(List<>))
+                    //if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(List<>))
+					if (true)
                     {
                         Type itemType = listType.GetGenericArguments()[0];
                         object customFiller = null;

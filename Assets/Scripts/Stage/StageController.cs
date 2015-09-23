@@ -27,7 +27,7 @@ namespace Clicker {
 		void Awake() {
 			DbInit();
 			// TODO(sonicmisora): remove this test line
-			PlayerData.Instance.GetCharacterData().gold += 10000;
+			PlayerData.Instance.GetCharacterData().gold += 200;
 		}
 
 		void Start() {

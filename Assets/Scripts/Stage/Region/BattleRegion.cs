@@ -94,10 +94,10 @@ namespace Clicker {
 						if (monsterInfo.hp <= 0) {
 							stageController.GoNextRegion();
 							if (PlayerData.CharcterData.isStockUsed) {
-								PlayerData.CharcterData.gold += monsterInfo.raw.goldDrop + 5000;
+								PlayerData.CharcterData.gold += monsterInfo.GoldDrop + 5000;
 								PlayerData.CharcterData.isStockUsed = false;
 							} else {
-								PlayerData.CharcterData.gold += monsterInfo.raw.goldDrop;
+								PlayerData.CharcterData.gold += monsterInfo.GoldDrop;
 							}
 						}
 						isBattleAnimePlaying = false;

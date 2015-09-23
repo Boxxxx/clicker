@@ -2,12 +2,39 @@
   "monster": {
     "1": {
       "id": "1",
-      "name": "slim",
-      "atk": 10,
-      "hp": 100,
+      "name": "wolf",
       "priority": 1,
       "doubleHitPossibility": 0.2,
-      "goldDrop": 100
+      "atk": [
+        {
+          "level": 0,
+          "value": 140
+        },
+        {
+          "level": 100,
+          "value": 5140
+        }
+      ],
+      "hp": [
+        {
+          "level": 0,
+          "value": 200
+        },
+        {
+          "level": 100,
+          "value": 6200
+        }
+      ],
+      "goldDrop": [
+        {
+          "level": 0,
+          "value": 92
+        },
+        {
+          "level": 100,
+          "value": 1492
+        }
+      ]
     }
   },
   "character": {
@@ -17,66 +44,42 @@
     "atkLevels": [
       {
         "level": 0,
-        "value": 50
-      },
-      {
-        "level": 1,
-        "value": 100
-      },
-      {
-        "level": 2,
-        "value": 150
-      },
-      {
-        "level": 3,
-        "value": 200
+        "value": 216
       },
       {
         "level": 4,
-        "value": 250
+        "value": 651
       }
     ],
     "defLevels": [
       {
         "level": 0,
-        "value": 150
-      },
-      {
-        "level": 1,
-        "value": 300
-      },
-      {
-        "level": 2,
-        "value": 450
-      },
-      {
-        "level": 3,
-        "value": 600
+        "value": 1908
       },
       {
         "level": 4,
-        "value": 750
+        "value": 5504
       }
     ]
   },
   "cost": {
     "atkLevelUp": [
-      100,
-      200,
-      300,
-      400,
-      500
+      236,
+      272,
+      308,
+      344,
+      380
     ],
     "defLevelUp": [
-      100,
-      200,
-      300,
-      400,
-      500
+      204,
+      258,
+      312,
+      366,
+      420
     ],
     "lifeSpanRestore": 100,
-    "potion": 50,
-    "stock": 150,
-    "divineReaper": 200
+    "potion": 150,
+    "stock": 200,
+    "divineReaper": 500
   }
 }
